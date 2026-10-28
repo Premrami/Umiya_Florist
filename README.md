@@ -45,3 +45,5 @@ npm run start
 [Architecture](docs/architecture.md) · [Database](docs/database.md) · [Admin guide](docs/admin-guide.md) · [Deployment](docs/deployment.md) · [Integrations](docs/integrations.md) · [Security](docs/security.md) · [Testing](docs/testing.md) · [Asset sources](docs/assets.md)
 
 This is a substantial locally verified implementation. Some requested advanced workflows and all external-service acceptance checks remain pending; the status file lists them explicitly. Do not import actual customer data until the security and privacy setup is completed.
+
+Admin inquiry phone alerts: see [WhatsApp/SMS setup](docs/inquiry-alerts.md). Delivery requires configured Twilio senders, template and admin number; channels are off by default.
