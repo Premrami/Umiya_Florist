@@ -350,8 +350,8 @@ export function Website({ content: c }: { content: PublicContent }) {
             <div className="section-image-viewport">
               <Image
                 fill
-                src={about.image_url || photos.bouquet}
-                alt="Seasonal flowers arranged with care"
+                src={about.image_url || photos.wedding}
+                alt="Pink and white floral arrangements decorating an elegant event table"
                 sizes="(max-width:700px) 90vw, 40vw"
               />
             </div>
