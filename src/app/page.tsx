@@ -2,7 +2,7 @@ import { publicContent } from '@/lib/content';
 import { Website } from '@/components/website';
 import { HomeEntrance } from '@/components/home-entrance';
 import { businessStructuredData, publicPageMetadata, serializeJsonLd } from '@/lib/seo';
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 export const metadata = publicPageMetadata(
   'Umiya Florist | Bouquets & Pooja Flowers in Ahmedabad',
   'Explore thoughtful bouquets, daily pooja flowers and event decorations from Umiya Florist in Ahmedabad. Tell us what you would like to create.',

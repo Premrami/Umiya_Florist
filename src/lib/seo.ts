@@ -1,25 +1,8 @@
 import type { Metadata } from 'next';
+import { postalAddress } from './business-details';
 
-/** Canonicals must never advertise localhost, a private network, or a guessed domain. */
-export function publicSiteOrigin(raw = process.env.NEXT_PUBLIC_APP_URL): string | undefined {
-  try {
-    const url = new URL(raw ?? '');
-    const host = url.hostname.toLowerCase();
-    if (
-      url.protocol !== 'https:' ||
-      url.username ||
-      url.password ||
-      host === 'localhost' ||
-      host === '[::1]' ||
-      host.endsWith('.local') ||
-      /^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host)
-    )
-      return undefined;
-    return url.origin;
-  } catch {
-    return undefined;
-  }
-}
+import { publicSiteOrigin } from './public-origin.mjs';
+export { publicSiteOrigin } from './public-origin.mjs';
 export function publicPageMetadata(title: string, description: string, path = '/'): Metadata {
   const origin = publicSiteOrigin();
   const url = origin ? new URL(path, origin).href : undefined;
@@ -56,13 +39,14 @@ export function businessStructuredData(settings: Record<string, string>) {
   const origin = publicSiteOrigin();
   if (!origin) return undefined;
   const name = settings.name || 'Umiya Florist';
+  const address = postalAddress(settings);
   const business = {
-    '@type': settings.address?.trim() ? 'Florist' : 'Organization',
+    '@type': address ? 'Florist' : 'Organization',
     '@id': origin + '/#business',
     name,
     url: origin,
     logo: origin + '/images/umiya-florist-logo.webp',
-    ...(settings.address?.trim() ? { address: settings.address.trim() } : {}),
+    ...(address ? { address } : {}),
     ...(settings.phone?.trim() ? { telephone: settings.phone.trim() } : {}),
     ...(settings.email?.trim() ? { email: settings.email.trim() } : {}),
     ...(settings.instagram?.startsWith('https://') ? { sameAs: [settings.instagram] } : {}),

@@ -43,12 +43,36 @@ describe('production SEO', () => {
     expect(data['@graph'][0]).not.toHaveProperty('address');
     expect(
       businessStructuredData({ address: 'Owner verified address' })!['@graph'][0],
-    ).toMatchObject({ '@type': 'Florist', address: 'Owner verified address' });
+    ).toMatchObject({ '@type': 'Organization' });
   });
   it('escapes script-closing content while retaining valid JSON', () => {
     const original = { name: '</script><script>test</script>' };
     const out = serializeJsonLd(original);
     expect(out).not.toContain('<');
     expect(JSON.parse(out)).toEqual(original);
+  });
+  it('emits a proper PostalAddress only for complete owner-provided address fields', () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://flowers.example.com');
+    const settings = {
+      address_street: 'Test street',
+      address_locality: 'Test city',
+      address_region: 'Test state',
+      address_postal_code: '12345',
+      address_country: 'in',
+    };
+    expect(businessStructuredData(settings)!['@graph'][0]).toMatchObject({
+      '@type': 'Florist',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Test street',
+        addressLocality: 'Test city',
+        addressRegion: 'Test state',
+        postalCode: '12345',
+        addressCountry: 'IN',
+      },
+    });
+    expect(
+      businessStructuredData({ ...settings, address_country: '' })!['@graph'][0]['@type'],
+    ).toBe('Organization');
   });
 });

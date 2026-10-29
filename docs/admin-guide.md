@@ -33,3 +33,10 @@ Create an item with its unit, then record positive receipts/purchases or negativ
 ## Permissions
 
 Owner: all configuration and operations. Admin: operations/content/finance/marketing, excluding ownership settings. Manager: CRM and operations. Accountant: finance and limited billing customer identity, with no direct access to private CRM records. Editor: published content management. Assignment-scoped field staff access is not yet enabled; the reserved staff role receives no broad business access.
+
+
+## Launch readiness and public details
+
+Owners can review the launch-readiness panel in Settings. Complete the verified public phone/email, structured shop address, privacy contact email, approved retention text and review date. Leave unknown facts blank; the public site avoids claiming a complete local-business address without them. The panel identifies missing setup and does not certify message delivery, accounting or security.
+
+Public content updates may be cached for up to 60 seconds; successful Studio public-content saves/publishes invalidate the website cache. Authorized unpublished preview always reads fresh data. Validation errors now identify and focus the affected field.

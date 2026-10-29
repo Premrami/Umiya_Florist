@@ -1,0 +1,630 @@
+[
+  {
+    "id": "R01",
+    "original_issue": "Page metadata, canonical URLs and query variants",
+    "status": "FIXED",
+    "root_cause": "Metadata was incomplete in the original site.",
+    "solution": "Retained production-aware per-page title/description, canonical and OG/Twitter metadata; shared the origin validator with the release checker.",
+    "files_modified": [
+      "src/lib/seo.ts",
+      "src/lib/public-origin.mjs",
+      "tests/seo.test.ts"
+    ],
+    "verification": "SEO unit tests; privacy route/browser checks.",
+    "remaining_limitations": "Public tags remain intentionally absent/noindex for localhost; see R02."
+  },
+  {
+    "id": "R02",
+    "original_issue": "Real public HTTPS origin and live indexing",
+    "status": "BLOCKED",
+    "root_cause": "No final public domain has been supplied.",
+    "solution": "Added check:release/build:release and an owner launch checklist. Never guessed a domain or enabled local indexing.",
+    "files_modified": [
+      "scripts/check-release.mjs",
+      "src/lib/readiness.ts",
+      "src/components/launch-readiness.tsx",
+      "package.json"
+    ],
+    "verification": "check:release correctly fails only the public HTTPS-origin check; configured database/inquiry keys pass presence checks.",
+    "remaining_limitations": "Owner must supply the preferred HTTPS origin, configure the deployment and rebuild. No automatic deployment performed."
+  },
+  {
+    "id": "R03",
+    "original_issue": "HTTPS/preferred-host redirects and HSTS",
+    "status": "PARTIALLY FIXED",
+    "root_cause": "Host ownership and deployment topology are unknown.",
+    "solution": "Added opt-in www/apex canonical redirect and production HTTPS-origin-gated HSTS; local development remains HTTP.",
+    "files_modified": [
+      "next.config.ts",
+      ".env.example"
+    ],
+    "verification": "Production build and config type checks; current environment deliberately leaves the redirect off.",
+    "remaining_limitations": "Live HTTPS, certificate and redirect-chain verification require the actual domain/hosting. ENFORCE_CANONICAL_HOST is off by default."
+  },
+  {
+    "id": "R04",
+    "original_issue": "Robots, sitemap and private route indexing/cache rules",
+    "status": "FIXED",
+    "root_cause": "Original coverage omitted privacy/private paths.",
+    "solution": "Retained public-only sitemap and private noindex/no-store headers; cached only public pages.",
+    "files_modified": [
+      "src/app/robots.ts",
+      "src/app/sitemap.ts",
+      "next.config.ts",
+      "src/app/page.tsx"
+    ],
+    "verification": "Browser private-route tests; runtime private APIs 401; public response cache HIT.",
+    "remaining_limitations": "Sitemap needs R02 to contain real public URLs."
+  },
+  {
+    "id": "R05",
+    "original_issue": "Structured local-business address/schema support",
+    "status": "FIXED",
+    "root_cause": "Only a free-form address existed, insufficient for a reliable PostalAddress.",
+    "solution": "Added optional owner-editable street/locality/region/postal/country fields and valid PostalAddress JSON-LD. Organization remains the fallback for incomplete facts.",
+    "files_modified": [
+      "src/lib/business-details.ts",
+      "src/lib/modules.ts",
+      "src/lib/seo.ts",
+      "tests/seo.test.ts"
+    ],
+    "verification": "Complete/partial address unit tests, settings tests, strict types/build.",
+    "remaining_limitations": "Real Google validation and business eligibility still require R02/R06; no result eligibility or rankings claimed."
+  },
+  {
+    "id": "R06",
+    "original_issue": "Missing verified business contact/address/hours",
+    "status": "BLOCKED",
+    "root_cause": "The requested verified facts have not been provided.",
+    "solution": "Added fields and clear owner readiness actions; rendered supplied address/email consistently. Asked for the missing facts.",
+    "files_modified": [
+      "src/lib/modules.ts",
+      "src/components/website.tsx",
+      "src/lib/readiness.ts"
+    ],
+    "verification": "Fixture completeness checks; no invented contact/address values inserted.",
+    "remaining_limitations": "Owner must provide and approve real public data. Nothing was written to the live database."
+  },
+  {
+    "id": "R07",
+    "original_issue": "Privacy draft, retention and contact disclosures",
+    "status": "PARTIALLY FIXED",
+    "root_cause": "A generic draft lacked editable approved wording and review information.",
+    "solution": "Wired privacy contact, retention wording and owner-reviewed date through Settings; the SSR notice uses them and remains explicitly a draft until complete. Added truthful configured-provider and metric data disclosures.",
+    "files_modified": [
+      "src/app/privacy/page.tsx",
+      "src/lib/modules.ts",
+      "src/lib/business-details.ts",
+      "tests/launch-readiness.test.ts"
+    ],
+    "verification": "Privacy route test; blank settings and readiness regression tests.",
+    "remaining_limitations": "Owner must approve actual policy, retention practice and contact details; no legal approval or automatic deletion is asserted."
+  },
+  {
+    "id": "R08",
+    "original_issue": "JSON-LD escaping and fabricated rich-result claims",
+    "status": "FIXED",
+    "root_cause": "Stored strings could otherwise close an inline script; unverified details must not become schema facts.",
+    "solution": "Retained escaping tests, omitted invented ratings/hours/offers, and gated Florist on complete actual address components.",
+    "files_modified": [
+      "src/lib/seo.ts",
+      "tests/seo.test.ts"
+    ],
+    "verification": "Script-closing round-trip test and missing-address tests pass.",
+    "remaining_limitations": "None for the verified local scope."
+  },
+  {
+    "id": "R09",
+    "original_issue": "One H1, conditional heading hierarchy, semantic landmarks",
+    "status": "FIXED",
+    "root_cause": "Populated testimonials/gallery and Studio footer previously had hierarchy/landmark gaps.",
+    "solution": "Retained corrected H2s, semantic footer, main landmarks and named navigation.",
+    "files_modified": [
+      "src/components/website.tsx",
+      "src/components/admin.tsx"
+    ],
+    "verification": "Public H1/anchor tests; axe at all requested widths and previous populated-content fixtures.",
+    "remaining_limitations": "None for the verified local scope."
+  },
+  {
+    "id": "R10",
+    "original_issue": "Public/private internal links and obsolete mobile test assumptions",
+    "status": "FIXED",
+    "root_cause": "Tests assumed missing credentials and old hamburger-only navigation.",
+    "solution": "Current dock/Menu, anchor, privacy/404 and protected route tests use real route behavior and mocked writes.",
+    "files_modified": [
+      "tests/e2e/public.spec.ts",
+      "playwright.config.ts"
+    ],
+    "verification": "48 Chromium/Firefox/WebKit browser checks including narrow and wide layouts.",
+    "remaining_limitations": "None for the verified local scope."
+  },
+  {
+    "id": "R11",
+    "original_issue": "Unsafe external URLs",
+    "status": "FIXED",
+    "root_cause": "Generic URL parsing previously allowed unsuitable protocols.",
+    "solution": "Retained HTTPS-only approved external settings and restricted image hosts; empty optional settings still save.",
+    "files_modified": [
+      "src/lib/modules.ts",
+      "tests/input-validation.test.ts"
+    ],
+    "verification": "URL-scheme, blank setting, form-save tests; zero browser CSP violations.",
+    "remaining_limitations": "None for the verified local scope."
+  },
+  {
+    "id": "R12",
+    "original_issue": "Public and Studio contrast/readability",
+    "status": "FIXED",
+    "root_cause": "Secondary text tokens were too light or too dark for their surfaces.",
+    "solution": "Retained the palette-preserving contrast corrections; new readiness/privacy content uses those tokens.",
+    "files_modified": [
+      "src/app/brand-theme.css"
+    ],
+    "verification": "Axe responsive/public dialog checks; screenshots.",
+    "remaining_limitations": "Automated checks do not certify all real screen-reader/device behavior."
+  },
+  {
+    "id": "R13",
+    "original_issue": "Mobile/tablet/desktop reflow and touch navigation",
+    "status": "FIXED",
+    "root_cause": "Small dialogs/titles and dock ordering previously needed correction.",
+    "solution": "Retained responsive layouts and validated the additional settings/notice content.",
+    "files_modified": [
+      "src/app/brand-theme.css",
+      "scripts/audit-responsive.mjs"
+    ],
+    "verification": "320/375/390/430/768/1024/1280/1440/1920 plus 459/460; no detected overflow.",
+    "remaining_limitations": "None for the verified local scope."
+  },
+  {
+    "id": "R14",
+    "original_issue": "Modal keyboard access and trigger-focus restoration",
+    "status": "FIXED",
+    "root_cause": "WebKit touch activation does not natively focus buttons.",
+    "solution": "Explicitly focus menu trigger buttons before opening; retain Escape, background scroll locking and return focus.",
+    "files_modified": [
+      "src/components/mobile-dock.tsx",
+      "src/components/website.tsx"
+    ],
+    "verification": "Initially 47/48 engine checks passed; after the fix all 48 passed, including WebKit mobile focus return.",
+    "remaining_limitations": "None for the verified local scope."
+  },
+  {
+    "id": "R15",
+    "original_issue": "Public form validation, duplicate requests and response states",
+    "status": "FIXED",
+    "root_cause": "Generic errors and asynchronous disabled-state updates were insufficient.",
+    "solution": "Retained field identification, synchronous duplicate guard, idempotency, unchecked optional consent, success reset and retry states.",
+    "files_modified": [
+      "src/components/website.tsx",
+      "src/lib/inquiry-validation.ts",
+      "tests/e2e/public.spec.ts"
+    ],
+    "verification": "Mocked errors/retry/success and duplicate-submit checks on all three engines; no live inquiry sent.",
+    "remaining_limitations": "None for the verified local scope."
+  },
+  {
+    "id": "R16",
+    "original_issue": "Studio corrective field feedback and numeric validation",
+    "status": "FIXED",
+    "root_cause": "Studio API errors did not identify the failing field.",
+    "solution": "Added safe Zod field messages and focus/aria-invalid linkage; retained numeric/phone limits and valid signed/decimal business quantities.",
+    "files_modified": [
+      "src/lib/auth.ts",
+      "src/components/admin.tsx",
+      "src/components/form-input.tsx"
+    ],
+    "verification": "Unit/component/input validation suites, settings-save tests, strict types/build.",
+    "remaining_limitations": "Database/provider-state errors remain deliberately generic to avoid leaking internal details."
+  },
+  {
+    "id": "R17",
+    "original_issue": "No-JavaScript usability",
+    "status": "FIXED",
+    "root_cause": "Content was readable but the online form did not explain its JavaScript requirement.",
+    "solution": "Added a no-JavaScript message and hid the JS-only submit action; preserved readable SSR content and links.",
+    "files_modified": [
+      "src/components/website.tsx"
+    ],
+    "verification": "No-JavaScript browser checks pass across engines.",
+    "remaining_limitations": "Online submission still requires JavaScript; no insecure URL/query-based submission fallback added."
+  },
+  {
+    "id": "R18",
+    "original_issue": "Alert request cleanup and React lint failure",
+    "status": "FIXED",
+    "root_cause": "Initial alerts fetch needed cancellation.",
+    "solution": "Retained cancellable fetch and used the same pattern for readiness; avoided setState after cancelled animation imports.",
+    "files_modified": [
+      "src/components/inquiry-alert-panel.tsx",
+      "src/components/launch-readiness.tsx",
+      "src/components/home-entrance.tsx"
+    ],
+    "verification": "Lint clean; animation early-skip/cleanup/watchdog tests; no page errors.",
+    "remaining_limitations": "None for the verified local scope."
+  },
+  {
+    "id": "R19",
+    "original_issue": "Critical development dependency advisories",
+    "status": "FIXED",
+    "root_cause": "Old Vitest/worker and URI-parser versions were affected.",
+    "solution": "Retained patched versions and rescanned after dependency cleanup.",
+    "files_modified": [
+      "package.json",
+      "package-lock.json"
+    ],
+    "verification": "Final npm audit reports zero advisories across production and development dependencies.",
+    "remaining_limitations": "None for the verified local scope."
+  },
+  {
+    "id": "R20",
+    "original_issue": "ESLint plugin declared peer support",
+    "status": "BLOCKED",
+    "root_cause": "Latest upstream React/import/a11y plugins still declare ESLint <=9; ESLint 9 is out of support.",
+    "solution": "Kept the supported existing ESLint 10 and tested its behavior. Did not force plugin overrides or downgrade to unsupported tooling.",
+    "files_modified": [
+      "package.json",
+      "package-lock.json"
+    ],
+    "verification": "Registry peer ranges checked again; lint and types pass.",
+    "remaining_limitations": "Upstream compatible declarations/releases are required to remove installation peer warnings safely."
+  },
+  {
+    "id": "R21",
+    "original_issue": "Slow public document/uncacheable cookie-bound content reads",
+    "status": "FIXED",
+    "root_cause": "Public content used a request-cookie Supabase client and force-dynamic homepage rendering.",
+    "solution": "Use a stateless anonymous client with tagged public fetch caching and one-minute ISR. Private/admin data is never cached.",
+    "files_modified": [
+      "src/lib/content.ts",
+      "src/lib/public-cache.ts",
+      "src/app/page.tsx",
+      "src/app/privacy/page.tsx"
+    ],
+    "verification": "Build lists / and /privacy as static/ISR; runtime STALE then HIT with public s-maxage=60; public-cache isolation tests pass.",
+    "remaining_limitations": "None for the verified local scope."
+  },
+  {
+    "id": "R22",
+    "original_issue": "CMS freshness after caching",
+    "status": "FIXED",
+    "root_cause": "Shared caching requires invalidation after publication/settings changes.",
+    "solution": "Expire public data tags and public page paths after successful authorized public-content writes/publish/delete; drafts preview bypasses caches.",
+    "files_modified": [
+      "src/lib/public-cache.ts",
+      "src/app/api/admin/[module]/route.ts",
+      "src/app/api/admin/actions/route.ts",
+      "src/app/admin/preview/page.tsx"
+    ],
+    "verification": "Three mocked publish-route tests plus cache tests prove successful save ordering, no invalidation on failure and fresh preview reads.",
+    "remaining_limitations": "Live owner publish-to-host acceptance remains part of R35; no live CMS record was changed."
+  },
+  {
+    "id": "R23",
+    "original_issue": "Initial JavaScript and unused imports/dependencies",
+    "status": "FIXED",
+    "root_cause": "Animation plugins loaded before they were needed; two old UI font packages were unused.",
+    "solution": "Split website motion, lazy-load GSAP only when the intro plays, remove unused font packages/imports, preserve fonts/animation assets.",
+    "files_modified": [
+      "src/components/website-motion.ts",
+      "src/components/website.tsx",
+      "src/components/home-entrance.tsx",
+      "package.json",
+      "docs/assets.md"
+    ],
+    "verification": "Unit cleanup/race tests, full intro playback on three engines, lint/types/build.",
+    "remaining_limitations": "Required React/GSAP runtime code is not treated as removable dead code."
+  },
+  {
+    "id": "R24",
+    "original_issue": "Forced layout/reflow and animation lifecycle",
+    "status": "PARTIALLY FIXED",
+    "root_cause": "Reveal setup interleaved geometry reads and transform writes.",
+    "solution": "Batch initial reveal measurements before GSAP writes; preserve context/listener/tween cleanup and cancellation after lazy loading.",
+    "files_modified": [
+      "src/components/website-motion.ts",
+      "src/components/home-entrance.tsx"
+    ],
+    "verification": "Browser navigation/intro checks, no errors, cancellation/watchdog tests.",
+    "remaining_limitations": "GSAP/ScrollTrigger still performs necessary geometry work; no claim of zero layout work or deletion of the approved SVG morph."
+  },
+  {
+    "id": "R25",
+    "original_issue": "Logo, favicon and responsive image delivery",
+    "status": "FIXED",
+    "root_cause": "Oversized browser-tab variants and full-resolution display logos consumed extra bytes.",
+    "solution": "Preserved exact favicon PNGs at 16/32/48px and high-resolution source; serve quality-100 responsive logos; keep original intro artwork.",
+    "files_modified": [
+      "src/app/favicon.ico",
+      "src/components/website.tsx",
+      "next.config.ts"
+    ],
+    "verification": "Favicon 67,749 to 5,898 bytes; image decode and viewport checks; original high-resolution monogram and approved logo remain.",
+    "remaining_limitations": "Automatic review rejected removing a hidden intro SVG because of animation risk. It was retained; only safer asset optimizations were applied."
+  },
+  {
+    "id": "R26",
+    "original_issue": "Hero priority, fonts and CLS",
+    "status": "FIXED",
+    "root_cause": "Hero discovery and font delivery competed with noncritical resources.",
+    "solution": "Retained exact preloaded local fonts/fallbacks; add prioritized responsive hero preload and keep below-fold photos lazy.",
+    "files_modified": [
+      "src/components/website.tsx",
+      "src/app/layout.tsx",
+      "next.config.ts"
+    ],
+    "verification": "Lighthouse and browser image decode checks; responsive visual checks.",
+    "remaining_limitations": "See R27 for the measured mobile loading target rather than equating an optimization with a guaranteed score."
+  },
+  {
+    "id": "R27",
+    "original_issue": "Mobile LCP <=2.5s",
+    "status": "PARTIALLY FIXED",
+    "root_cause": "Transfer, discovery, initial client work and document fetching affected mobile loading.",
+    "solution": "Implemented R21-R26 and measured repeated production runs; preserve all approved animations.",
+    "files_modified": [
+      "src/lib/content.ts",
+      "src/components/website-motion.ts",
+      "src/components/website.tsx",
+      "next.config.ts"
+    ],
+    "verification": "Three final production Lighthouse mobile runs: performance 86 each, median LCP 4215.18ms (range 4214.64\u20134284.75), CLS 0 and median TBT 15.5ms. Desktop performance 99, LCP 847.98ms.",
+    "remaining_limitations": "Mobile LCP remains above the requested 2500ms target. No deployed field Core Web Vitals claim; retain approved animation and verify on real hosting/networks after R02."
+  },
+  {
+    "id": "R28",
+    "original_issue": "INP measurement and runtime performance visibility",
+    "status": "PARTIALLY FIXED",
+    "root_cause": "No real field traffic or privacy-approved collection was available.",
+    "solution": "Added disabled-by-default minimal first-party LCP/INP/CLS collection with strict payload/origin/size checks and DNT respect.",
+    "files_modified": [
+      "src/components/web-vitals.tsx",
+      "src/lib/vitals.ts",
+      "src/app/api/vitals/route.ts",
+      ".env.example"
+    ],
+    "verification": "Metric privacy/size/disabled tests; runtime endpoint 404 while disabled; synthetic maximum interaction duration 64ms.",
+    "remaining_limitations": "64ms is an observed lab Event Timing duration, not field INP. Owner approval, deployed traffic and aggregation are required; collection remains off."
+  },
+  {
+    "id": "R29",
+    "original_issue": "CSP and security-header hardening",
+    "status": "PARTIALLY FIXED",
+    "root_cause": "There was no compatible app-wide policy or domain-gated HSTS.",
+    "solution": "Added enforced self-hosted resource, object/base/frame/form restrictions and secure host policy without breaking Next/GSAP.",
+    "files_modified": [
+      "next.config.ts"
+    ],
+    "verification": "No securitypolicyviolation events in checked flows; all browser engine tests pass.",
+    "remaining_limitations": "Inline script/style allowance remains for current Next/GSAP/ISR architecture. A nonce/hash stricter policy needs a separate deployment tradeoff review."
+  },
+  {
+    "id": "R30",
+    "original_issue": "Owner launch checklist and release guard",
+    "status": "FIXED",
+    "root_cause": "Launch blockers existed only in documentation.",
+    "solution": "Added owner-protected readiness API/panel, production configuration command, and build:release gate.",
+    "files_modified": [
+      "src/lib/readiness.ts",
+      "src/app/api/admin/readiness/route.ts",
+      "src/components/launch-readiness.tsx",
+      "scripts/check-release.mjs"
+    ],
+    "verification": "Owner gate tests; no secret data in response; real release check refuses the missing domain.",
+    "remaining_limitations": "A configuration pass is not a substitute for the remaining manual acceptance gates."
+  },
+  {
+    "id": "R31",
+    "original_issue": "Cross-browser coverage",
+    "status": "FIXED",
+    "root_cause": "Only Chromium had been exercised previously.",
+    "solution": "Installed isolated Firefox/WebKit test engines and added repeatable opt-in projects.",
+    "files_modified": [
+      "playwright.config.ts",
+      "tests/e2e/public.spec.ts"
+    ],
+    "verification": "48/48 checks passed on Chromium, Firefox and WebKit in wide/narrow profiles.",
+    "remaining_limitations": "WebKit emulation is not a claim of physical iPhone/Safari app acceptance."
+  },
+  {
+    "id": "R32",
+    "original_issue": "Screen reader, text zoom and physical-device acceptance",
+    "status": "PARTIALLY FIXED",
+    "root_cause": "Automated scans do not establish full WCAG certification.",
+    "solution": "Verified semantic landmarks, labels, keyboard flow, 320px reflow, focus return, reduced motion and browser engines.",
+    "files_modified": [
+      "scripts/audit-responsive.mjs",
+      "tests/e2e/public.spec.ts"
+    ],
+    "verification": "Axe and keyboard/reflow evidence retained.",
+    "remaining_limitations": "Physical iOS/Android, VoiceOver/NVDA and user text-zoom acceptance still require manual assistive-device sessions."
+  },
+  {
+    "id": "R33",
+    "original_issue": "Real credentials reported missing in 19 October report",
+    "status": "NOT APPLICABLE",
+    "root_cause": "That is a historical statement, not the present environment.",
+    "solution": "Current presence checks confirm local Supabase and inquiry keys exist; historical wording is preserved with a superseding status note.",
+    "files_modified": [
+      "docs/implementation-status.md",
+      "docs/validation-report.md"
+    ],
+    "verification": "check:release verifies presence without printing values.",
+    "remaining_limitations": "Presence does not certify live services, delivery, staging or deployment; see R35/R36."
+  },
+  {
+    "id": "R34",
+    "original_issue": "FAQ/Product/review rich-result promises and 3D replacement",
+    "status": "NOT APPLICABLE",
+    "root_cause": "No verified offers/ratings justify Product/Review schema; the approved current animation supersedes the old optional bloom-video request.",
+    "solution": "Kept honest informational schema and the approved intro; did not invent rich-result facts or replace the design.",
+    "files_modified": [
+      "src/lib/seo.ts",
+      "docs/audit-2026-10-28/report.md"
+    ],
+    "verification": "Schema tests and full intro browser checks.",
+    "remaining_limitations": "No ranking guarantee or automatic asset-generation/replacement is part of this remediation."
+  },
+  {
+    "id": "R35",
+    "original_issue": "Actual role sessions, Auth recovery and Supabase API/Storage RLS acceptance",
+    "status": "BLOCKED",
+    "root_cause": "Isolated tests do not provide real owner/editor/accountant sessions or a separate staging environment.",
+    "solution": "Retained permission guards, unit/database tests and public denial checks; no authentication bypass or production mutations used.",
+    "files_modified": [
+      "tests/public-cache.test.ts",
+      "tests/public-publish.test.ts",
+      "tests/launch-routes.test.ts"
+    ],
+    "verification": "Database tests and public denial checks pass; actual session acceptance not claimed.",
+    "remaining_limitations": "Requires owner-operated staging accounts and approved live-service test fixtures."
+  },
+  {
+    "id": "R36",
+    "original_issue": "Payment/refund/webhook/email/SMS delivery and reconciliation acceptance",
+    "status": "BLOCKED",
+    "root_cause": "Provider delivery/test events require approved accounts, fixtures and a reachable deployment.",
+    "solution": "Preserved integrations and tested ledger/signature/alert behavior without real transactions or messages.",
+    "files_modified": [
+      "tests/database.test.ts",
+      "tests/inquiry-alerts.test.ts",
+      "docs/testing.md"
+    ],
+    "verification": "Local automated tests pass; no live payment/email/SMS/WhatsApp sent.",
+    "remaining_limitations": "External acceptance is needed. WhatsApp stays paused; no message dispatch or live payment is authorized as a test here."
+  },
+  {
+    "id": "R37",
+    "original_issue": "Backups, restoration, hosting, incident/MFA/session policy and monitoring transport",
+    "status": "BLOCKED",
+    "root_cause": "These require infrastructure administration and real recovery/session decisions.",
+    "solution": "Provided release controls, secure defaults and a clear acceptance procedure without changing accounts or deploying.",
+    "files_modified": [
+      "docs/deployment.md",
+      "docs/security.md",
+      "scripts/check-release.mjs"
+    ],
+    "verification": "Local configuration and guard checks pass.",
+    "remaining_limitations": "Owner must verify backup restore, MFA/session limits, hosting access, monitoring transport and incident contacts."
+  },
+  {
+    "id": "R38",
+    "original_issue": "GST/tax invoice layout, QR and accountant approval",
+    "status": "BLOCKED",
+    "root_cause": "Jurisdiction/accounting choices and approved document requirements were not supplied.",
+    "solution": "Preserved integer-paise billing, immutable ledgers and existing PDF tests; no speculative financial model changes.",
+    "files_modified": [
+      "docs/implementation-status.md",
+      "docs/deployment.md"
+    ],
+    "verification": "Financial/PDF regression tests remain passing.",
+    "remaining_limitations": "Requires accountant-approved GST breakdown, numbering, QR requirements and acceptance before implementation can be finalized."
+  },
+  {
+    "id": "R39",
+    "original_issue": "Suppliers, purchase orders and full event material reservations",
+    "status": "BLOCKED",
+    "root_cause": "This is unimplemented legacy master-brief feature scope, not a known technical defect in current inventory movement logic.",
+    "solution": "Cross-checked current expense/stock/task flows and preserved them; did not invent procurement/reservation contracts.",
+    "files_modified": [
+      "docs/implementation-status.md",
+      "docs/admin-guide.md"
+    ],
+    "verification": "Existing booking and stock-ledger tests pass.",
+    "remaining_limitations": "Requires agreed supplier/PO/reservation workflow and an approved additive schema/migration plan."
+  },
+  {
+    "id": "R40",
+    "original_issue": "Item-price edit/removal, client tags/birthdays and expanded reporting/export",
+    "status": "BLOCKED",
+    "root_cause": "Historical feature backlog has no supplied data-retention/editing/export acceptance rules.",
+    "solution": "Current item add/effective-price and truthful current-page export remain intact.",
+    "files_modified": [
+      "docs/implementation-status.md",
+      "src/components/admin.tsx"
+    ],
+    "verification": "Existing UI/financial tests pass.",
+    "remaining_limitations": "Requires approved product scope and safe historical billing/PII export rules; not falsely marked implemented."
+  },
+  {
+    "id": "R41",
+    "original_issue": "Assignment-scoped field-staff, in-app MFA/owner role editing and auxiliary schema parity",
+    "status": "BLOCKED",
+    "root_cause": "Assignments, ownership safeguards and provider MFA policy need explicit design; reserved staff is intentionally denied broad access.",
+    "solution": "Preserved role/RLS boundaries and accountant billing identity; did not enable the reserved staff role or weaken access.",
+    "files_modified": [
+      "docs/security.md",
+      "docs/implementation-status.md"
+    ],
+    "verification": "Role/database tests pass.",
+    "remaining_limitations": "Requires approved authorization model, recovery policy and associated schema/provider setup."
+  },
+  {
+    "id": "R42",
+    "original_issue": "Video/multiple media, drag sorting and comprehensive reuse/deletion safeguards",
+    "status": "BLOCKED",
+    "root_cause": "These are separate legacy media features with no approved media lifecycle or storage policy.",
+    "solution": "Preserved validated public images/private attachment foundations and existing upload restrictions.",
+    "files_modified": [
+      "docs/implementation-status.md",
+      "docs/security.md"
+    ],
+    "verification": "Existing media tests pass.",
+    "remaining_limitations": "Requires media/storage/retention decisions and safe migrations; no live media deleted or unsupported video pipeline asserted."
+  },
+  {
+    "id": "R43",
+    "original_issue": "Quotation communication templates, bounce callbacks and orphan provider-link UI",
+    "status": "BLOCKED",
+    "root_cause": "Approved templates/sender/provider events and operational reconciliation rules are missing.",
+    "solution": "Retained existing reviewed invoice communication and provider idempotency paths; no automatic sending introduced.",
+    "files_modified": [
+      "docs/implementation-status.md",
+      "docs/integrations.md"
+    ],
+    "verification": "Existing provider/signature/local alert tests remain passing.",
+    "remaining_limitations": "Requires provider test setup, reviewed content, bounce/event contracts and owner reconciliation acceptance."
+  },
+  {
+    "id": "R44",
+    "original_issue": "Full multilingual CMS, section ordering and section-specific content models",
+    "status": "BLOCKED",
+    "root_cause": "These are unimplemented legacy product features beyond the approved current structured section model.",
+    "solution": "Preserved existing CMS fields, mobile order and animations; no guessed translation or content/schema redesign.",
+    "files_modified": [
+      "docs/implementation-status.md"
+    ],
+    "verification": "Current CMS publishing/private preview tests and public navigation checks pass.",
+    "remaining_limitations": "Requires approved locale/content/editorial model and additive schema/UI acceptance."
+  },
+  {
+    "id": "R45",
+    "original_issue": "Concurrency/load, restore and production monitoring tests",
+    "status": "BLOCKED",
+    "root_cause": "There is no isolated staging deployment or approved load/restore target.",
+    "solution": "Retained transactional/idempotency tests and added repeatable browser/configuration checks; no load was directed at live business services.",
+    "files_modified": [
+      "docs/testing.md",
+      "tests/database.test.ts",
+      "scripts/audit-responsive.mjs"
+    ],
+    "verification": "Local tests/production build pass.",
+    "remaining_limitations": "Requires a staging target, workload limits, restore access and monitoring alert destination."
+  },
+  {
+    "id": "R46",
+    "original_issue": "Private secrets in client assets",
+    "status": "FIXED",
+    "root_cause": "Audit requires a boundary check, not exposing credentials in reports.",
+    "solution": "Retained server-only credential access and verify compiled public assets do not contain configured secret values.",
+    "files_modified": [
+      "src/lib/content.ts",
+      "src/app/api/admin/readiness/route.ts",
+      "tests/public-cache.test.ts",
+      "tests/launch-routes.test.ts"
+    ],
+    "verification": "Server/client boundary tests and a value-redacted compiled-asset scan.",
+    "remaining_limitations": "This is not a penetration-test certification."
+  }
+]

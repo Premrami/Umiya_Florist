@@ -1,0 +1,10 @@
+{
+  "beforeBytes": 67749,
+  "afterBytes": 5898,
+  "retainedSizes": [
+    16,
+    32,
+    48
+  ],
+  "fidelity": "Original embedded PNGs retained byte-for-byte. High-resolution monogram source remains in public/images."
+}

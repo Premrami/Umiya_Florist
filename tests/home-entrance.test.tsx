@@ -58,16 +58,18 @@ describe('homepage entrance accessibility and recovery', () => {
     expect(document.body.style.overflow).toBe('auto');
     expect(sessionStorage.getItem('umiya-seed-intro-v2')).toBe('seen');
   });
-  it('supports Escape dismissal and cleans up animation work', () => {
+  it('supports Escape dismissal and cleans up animation work', async () => {
     enter();
+    await act(() => vi.dynamicImportSettled());
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(animation.revert).toHaveBeenCalled();
   });
-  it('replays the landing intro when returning to the homepage', () => {
+  it('replays the landing intro when returning to the homepage', async () => {
     sessionStorage.setItem('umiya-seed-intro-v2', 'seen');
     enter();
     expect(screen.getByRole('dialog')).toBeTruthy();
+    await act(() => vi.dynamicImportSettled());
     expect(animation.context).toHaveBeenCalled();
   });
   it('keeps direct section links accessible without an intro', () => {
@@ -87,21 +89,30 @@ describe('homepage entrance accessibility and recovery', () => {
     expect(animation.context).not.toHaveBeenCalled();
     expect(document.body.style.overflow).toBe('auto');
   });
-  it('fails open if animation setup throws', () => {
+  it('fails open if animation setup throws', async () => {
     animation.context.mockImplementation(() => {
       throw new Error('Animation unavailable');
     });
     enter();
+    await act(() => vi.dynamicImportSettled());
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(document.body.style.overflow).toBe('auto');
   });
-  it('opens the website even if the animation completion callback never runs', () => {
+  it('opens the website even if the animation completion callback never runs', async () => {
     vi.useFakeTimers();
     enter();
+    await act(() => vi.dynamicImportSettled());
     act(() => {
       vi.advanceTimersByTime(10000);
     });
     expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.body.style.overflow).toBe('auto');
+  });
+  it('never starts a late-loaded animation after an early skip', async () => {
+    enter();
+    fireEvent.click(screen.getByRole('button', { name: /Skip intro/ }));
+    await act(() => vi.dynamicImportSettled());
+    expect(animation.context).not.toHaveBeenCalled();
     expect(document.body.style.overflow).toBe('auto');
   });
 });

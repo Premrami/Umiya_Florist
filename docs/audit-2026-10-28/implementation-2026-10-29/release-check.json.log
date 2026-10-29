@@ -1,0 +1,39 @@
+
+> umiya-florist@0.1.0 check:release
+> node scripts/check-release.mjs
+
+{
+  "purpose": "Configuration check only. Does not deploy, authenticate, send messages, or replace owner/staging acceptance.",
+  "checks": [
+    {
+      "id": "public-https-origin",
+      "ready": false,
+      "action": "Set NEXT_PUBLIC_APP_URL to the final public HTTPS origin."
+    },
+    {
+      "id": "NEXT_PUBLIC_SUPABASE_URL",
+      "ready": true,
+      "action": "Configure NEXT_PUBLIC_SUPABASE_URL in the deployment environment."
+    },
+    {
+      "id": "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "ready": true,
+      "action": "Configure NEXT_PUBLIC_SUPABASE_ANON_KEY in the deployment environment."
+    },
+    {
+      "id": "SUPABASE_SERVICE_ROLE_KEY",
+      "ready": true,
+      "action": "Configure SUPABASE_SERVICE_ROLE_KEY in the deployment environment."
+    },
+    {
+      "id": "INQUIRY_RATE_LIMIT_SALT",
+      "ready": true,
+      "action": "Configure INQUIRY_RATE_LIMIT_SALT in the deployment environment."
+    },
+    {
+      "id": "production-environment",
+      "ready": true,
+      "action": "Use the production environment for the launch build; previews remain noindex."
+    }
+  ]
+}

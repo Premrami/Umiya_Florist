@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
+import type gsap from 'gsap';
 import approvedLogoShapes from '@/lib/intro-logo-shapes.json';
 import { EntranceReadyContext } from './entrance-context';
 
@@ -329,13 +329,7 @@ const LOGO_BUD =
 
 function AnimatedLogo() {
   const image = (
-    <image
-      href="/images/umiya-florist-logo.webp"
-      x="280"
-      y="215"
-      width="1430"
-      height="370"
-    />
+    <image href="/images/umiya-florist-logo.webp" x="280" y="215" width="1430" height="370" />
   );
   return (
     <svg
@@ -447,162 +441,174 @@ function BrandIntro({ onStart, onComplete }: { onStart: () => void; onComplete: 
       }
     };
     document.addEventListener('keydown', keydown);
-    const fallback = window.setTimeout(finish, 10000);
+    let fallback = window.setTimeout(finish, 15000);
+    let disposed = false;
     let context: gsap.Context | undefined;
-    try {
-      context = gsap.context(() => {
-        const paths = root.current!.querySelectorAll<SVGPathElement>(
-          '.intro-roots path,.intro-stem,.intro-flourish-reveal,.intro-y-stem',
-        );
-        paths.forEach((path) => {
-          const length = path.getTotalLength();
-          gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
-        });
-        const art = root.current!.querySelector('.intro-plant')!.getBoundingClientRect();
-        const scale = art.width / 640 || 1;
-        const seedStart = -(art.top + 385 * scale + 20) / scale;
-        const mark = root.current!.querySelector('.intro-logo')!.getBoundingClientRect();
-        const logoScale = mark.width / 1430;
-        const targetX = mark.left + (955 - 280) * logoScale;
-        const targetY = mark.top + (482 - 215) * logoScale;
-        const flightX = (targetX - (art.left + 320 * scale)) / scale;
-        const flightY = (targetY - (art.top + 192 * scale)) / scale;
-        const budScale = logoScale / scale;
-        const orbit = root.current!.querySelector<SVGPathElement>('.intro-orbit-path')!;
-        orbit.setAttribute(
-          'd',
-          `M0 0C0 -80 140 -80 140 0C140 80 0 80 0 0C0 -35 ${flightX + 65} ${flightY - 45} ${flightX} ${flightY}`,
-        );
-        const orbitLength = orbit.getTotalLength();
-        gsap.set(orbit, { strokeDasharray: orbitLength, strokeDashoffset: orbitLength });
-        const flight = { progress: 0 };
-        const flower = root.current!.querySelector<SVGGElement>('.intro-flower')!;
-        const timeline = gsap.timeline({ onComplete: finish });
-        timeline
-          .set('.intro-scene', { xPercent: -50, yPercent: -50, x: 0, y: 0 })
-          .set('.intro-logo', { xPercent: -50, yPercent: -50, x: 0, y: 0 })
-          .set('.intro-caption', { xPercent: -50, x: 0, y: 8 })
-          .set('.intro-seed', { y: seedStart, x: -18, rotation: -35, transformOrigin: 'center' })
-          .to('.intro-kicker', { opacity: 0.7, duration: 0.7 }, 0)
-          .to('.intro-seed', { y: 0, x: 0, rotation: 12, duration: 1.15, ease: 'power2.in' }, 0.15)
-          .to('.intro-seed', { y: -4, rotation: -3, duration: 0.17, ease: 'power2.out' }, 1.3)
-          .to('.intro-seed', { y: 0, rotation: 0, duration: 0.24, ease: 'power2.inOut' }, 1.47)
-          .to('.intro-soil,.intro-ground-shadow', { opacity: 1, duration: 0.5 }, 0.85)
-          .fromTo(
-            '.intro-dust circle',
-            { opacity: 0, y: 0 },
-            { opacity: 0.25, y: -12, stagger: 0.035, duration: 0.25 },
-            1.3,
-          )
-          .to('.intro-dust circle', { opacity: 0, y: -23, duration: 0.7 }, 1.7)
-          .to(
-            '.intro-roots path',
-            { strokeDashoffset: 0, duration: 1.2, stagger: 0.07, ease: 'power2.out' },
-            1.65,
-          )
-          .to(
-            '.intro-seed',
-            { scaleX: 0.65, scaleY: 0.3, y: 5, opacity: 0, duration: 0.18, ease: 'power2.in' },
-            1.72,
-          )
-          .to('.intro-stem', { strokeDashoffset: 0, duration: 1.85, ease: 'sine.inOut' }, 1.9)
-          .to(
-            '.intro-leaf-left',
-            { attr: { transform: 'scale(1) rotate(0)' }, duration: 1.35, ease: 'sine.out' },
-            2.55,
-          )
-          .to(
-            '.intro-leaf-right',
-            { attr: { transform: 'scale(1) rotate(0)' }, duration: 1.3, ease: 'sine.out' },
-            2.95,
-          )
-          .to(
-            '.intro-petal',
-            {
-              attr: { transform: 'scale(1 1)' },
-              opacity: 1,
-              stagger: 0.018,
-              duration: 1.05,
-              ease: 'sine.inOut',
-            },
-            3.05,
-          )
-          .to('.intro-flower-heart', { opacity: 1, duration: 0.65 }, 3.65)
-          .to('.intro-kicker', { opacity: 0, duration: 0.45 }, 4.3)
-          .to(
-            '.intro-leaf,.intro-roots,.intro-stem,.intro-seed,.intro-soil,.intro-ground-shadow,.intro-calyx',
-            { opacity: 0, duration: 0.85, stagger: 0.025 },
-            4.45,
-          )
-          .to(orbit, { opacity: 0.4, duration: 0.3 }, 4.45)
-          .to(orbit, { strokeDashoffset: 0, duration: 2.15, ease: 'sine.inOut' }, 4.45)
-          .to(
-            flight,
-            {
-              progress: 1,
-              duration: 2.15,
-              ease: 'sine.inOut',
-              onUpdate: () => {
-                const point = orbit.getPointAtLength(orbitLength * flight.progress);
-                const fold = Math.max(0, (flight.progress - 0.68) / 0.32);
-                const size = 1 + (budScale - 1) * fold;
-                flower.setAttribute('transform', `translate(${point.x} ${point.y}) scale(${size})`);
+    void import('gsap')
+      .then(({ default: gsap }) => {
+        if (disposed || finished) return;
+        clearTimeout(fallback);
+        fallback = window.setTimeout(finish, 10000);
+        context = gsap.context(() => {
+          const paths = root.current!.querySelectorAll<SVGPathElement>(
+            '.intro-roots path,.intro-stem,.intro-flourish-reveal,.intro-y-stem',
+          );
+          paths.forEach((path) => {
+            const length = path.getTotalLength();
+            gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+          });
+          const art = root.current!.querySelector('.intro-plant')!.getBoundingClientRect();
+          const scale = art.width / 640 || 1;
+          const seedStart = -(art.top + 385 * scale + 20) / scale;
+          const mark = root.current!.querySelector('.intro-logo')!.getBoundingClientRect();
+          const logoScale = mark.width / 1430;
+          const targetX = mark.left + (955 - 280) * logoScale;
+          const targetY = mark.top + (482 - 215) * logoScale;
+          const flightX = (targetX - (art.left + 320 * scale)) / scale;
+          const flightY = (targetY - (art.top + 192 * scale)) / scale;
+          const budScale = logoScale / scale;
+          const orbit = root.current!.querySelector<SVGPathElement>('.intro-orbit-path')!;
+          orbit.setAttribute(
+            'd',
+            `M0 0C0 -80 140 -80 140 0C140 80 0 80 0 0C0 -35 ${flightX + 65} ${flightY - 45} ${flightX} ${flightY}`,
+          );
+          const orbitLength = orbit.getTotalLength();
+          gsap.set(orbit, { strokeDasharray: orbitLength, strokeDashoffset: orbitLength });
+          const flight = { progress: 0 };
+          const flower = root.current!.querySelector<SVGGElement>('.intro-flower')!;
+          const timeline = gsap.timeline({ onComplete: finish });
+          timeline
+            .set('.intro-scene', { xPercent: -50, yPercent: -50, x: 0, y: 0 })
+            .set('.intro-logo', { xPercent: -50, yPercent: -50, x: 0, y: 0 })
+            .set('.intro-caption', { xPercent: -50, x: 0, y: 8 })
+            .set('.intro-seed', { y: seedStart, x: -18, rotation: -35, transformOrigin: 'center' })
+            .to('.intro-kicker', { opacity: 0.7, duration: 0.7 }, 0)
+            .to(
+              '.intro-seed',
+              { y: 0, x: 0, rotation: 12, duration: 1.15, ease: 'power2.in' },
+              0.15,
+            )
+            .to('.intro-seed', { y: -4, rotation: -3, duration: 0.17, ease: 'power2.out' }, 1.3)
+            .to('.intro-seed', { y: 0, rotation: 0, duration: 0.24, ease: 'power2.inOut' }, 1.47)
+            .to('.intro-soil,.intro-ground-shadow', { opacity: 1, duration: 0.5 }, 0.85)
+            .fromTo(
+              '.intro-dust circle',
+              { opacity: 0, y: 0 },
+              { opacity: 0.25, y: -12, stagger: 0.035, duration: 0.25 },
+              1.3,
+            )
+            .to('.intro-dust circle', { opacity: 0, y: -23, duration: 0.7 }, 1.7)
+            .to(
+              '.intro-roots path',
+              { strokeDashoffset: 0, duration: 1.2, stagger: 0.07, ease: 'power2.out' },
+              1.65,
+            )
+            .to(
+              '.intro-seed',
+              { scaleX: 0.65, scaleY: 0.3, y: 5, opacity: 0, duration: 0.18, ease: 'power2.in' },
+              1.72,
+            )
+            .to('.intro-stem', { strokeDashoffset: 0, duration: 1.85, ease: 'sine.inOut' }, 1.9)
+            .to(
+              '.intro-leaf-left',
+              { attr: { transform: 'scale(1) rotate(0)' }, duration: 1.35, ease: 'sine.out' },
+              2.55,
+            )
+            .to(
+              '.intro-leaf-right',
+              { attr: { transform: 'scale(1) rotate(0)' }, duration: 1.3, ease: 'sine.out' },
+              2.95,
+            )
+            .to(
+              '.intro-petal',
+              {
+                attr: { transform: 'scale(1 1)' },
+                opacity: 1,
+                stagger: 0.018,
+                duration: 1.05,
+                ease: 'sine.inOut',
               },
-            },
-            4.45,
-          )
-          .to(
-            '.intro-bloom',
-            { attr: { transform: 'rotate(360)' }, duration: 1.25, ease: 'sine.inOut' },
-            4.45,
-          )
-          .to(
-            '.intro-petal-angle',
-            { attr: { transform: 'rotate(0)' }, duration: 1.85, ease: 'sine.inOut' },
-            5.65,
-          )
-          .to(
-            '.intro-flower-surface',
-            {
-              attr: {
-                d: (index: number) => logoPath(logoShapes[index].loops),
-                'stroke-width': 0,
+              3.05,
+            )
+            .to('.intro-flower-heart', { opacity: 1, duration: 0.65 }, 3.65)
+            .to('.intro-kicker', { opacity: 0, duration: 0.45 }, 4.3)
+            .to(
+              '.intro-leaf,.intro-roots,.intro-stem,.intro-seed,.intro-soil,.intro-ground-shadow,.intro-calyx',
+              { opacity: 0, duration: 0.85, stagger: 0.025 },
+              4.45,
+            )
+            .to(orbit, { opacity: 0.4, duration: 0.3 }, 4.45)
+            .to(orbit, { strokeDashoffset: 0, duration: 2.15, ease: 'sine.inOut' }, 4.45)
+            .to(
+              flight,
+              {
+                progress: 1,
+                duration: 2.15,
+                ease: 'sine.inOut',
+                onUpdate: () => {
+                  const point = orbit.getPointAtLength(orbitLength * flight.progress);
+                  const fold = Math.max(0, (flight.progress - 0.68) / 0.32);
+                  const size = 1 + (budScale - 1) * fold;
+                  flower.setAttribute(
+                    'transform',
+                    `translate(${point.x} ${point.y}) scale(${size})`,
+                  );
+                },
               },
-              duration: 1.85,
-              stagger: 0.006,
-              ease: 'sine.inOut',
-            },
-            5.65,
-          )
-          .to(
-            '.intro-morph-stop',
-            {
-              attr: { 'stop-color': (index: number) => logoShapes[Math.floor(index / 3)].fill },
-              duration: 1.85,
-              ease: 'sine.inOut',
-            },
-            5.65,
-          )
-          .to(
-            '.intro-flower-heart',
-            { attr: { transform: 'scale(0)' }, duration: 0.65, ease: 'sine.inOut' },
-            5.65,
-          )
-          .to(orbit, { opacity: 0, duration: 0.85 }, 6.3)
-          .to('.intro-y-stem', { strokeDashoffset: 0, duration: 0.95, ease: 'sine.inOut' }, 7.45)
-          .to(
-            '.intro-y-bud',
-            { attr: { transform: 'scale(1)' }, duration: 0.55, ease: 'sine.out' },
-            8.2,
-          )
-          .to('.intro-caption', { opacity: 0.7, y: 0, duration: 0.55 }, 8.35)
-          .to('.intro-progress-fill', { scaleX: 1, duration: 9.05, ease: 'none' }, 0)
-          .to(root.current, { opacity: 0, duration: 0.75, ease: 'sine.inOut' }, 9.05);
-      }, root);
-    } catch {
-      finish();
-    }
+              4.45,
+            )
+            .to(
+              '.intro-bloom',
+              { attr: { transform: 'rotate(360)' }, duration: 1.25, ease: 'sine.inOut' },
+              4.45,
+            )
+            .to(
+              '.intro-petal-angle',
+              { attr: { transform: 'rotate(0)' }, duration: 1.85, ease: 'sine.inOut' },
+              5.65,
+            )
+            .to(
+              '.intro-flower-surface',
+              {
+                attr: {
+                  d: (index: number) => logoPath(logoShapes[index].loops),
+                  'stroke-width': 0,
+                },
+                duration: 1.85,
+                stagger: 0.006,
+                ease: 'sine.inOut',
+              },
+              5.65,
+            )
+            .to(
+              '.intro-morph-stop',
+              {
+                attr: { 'stop-color': (index: number) => logoShapes[Math.floor(index / 3)].fill },
+                duration: 1.85,
+                ease: 'sine.inOut',
+              },
+              5.65,
+            )
+            .to(
+              '.intro-flower-heart',
+              { attr: { transform: 'scale(0)' }, duration: 0.65, ease: 'sine.inOut' },
+              5.65,
+            )
+            .to(orbit, { opacity: 0, duration: 0.85 }, 6.3)
+            .to('.intro-y-stem', { strokeDashoffset: 0, duration: 0.95, ease: 'sine.inOut' }, 7.45)
+            .to(
+              '.intro-y-bud',
+              { attr: { transform: 'scale(1)' }, duration: 0.55, ease: 'sine.out' },
+              8.2,
+            )
+            .to('.intro-caption', { opacity: 0.7, y: 0, duration: 0.55 }, 8.35)
+            .to('.intro-progress-fill', { scaleX: 1, duration: 9.05, ease: 'none' }, 0)
+            .to(root.current, { opacity: 0, duration: 0.75, ease: 'sine.inOut' }, 9.05);
+        }, root);
+      })
+      .catch(finish);
     return () => {
+      disposed = true;
       complete.current = () => {};
       context?.revert();
       clearTimeout(fallback);

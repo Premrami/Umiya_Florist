@@ -429,6 +429,20 @@ export const specs: Record<string, ModuleSpec> = {
         phone: optionalPhoneSchema,
         whatsapp: optionalPhoneSchema,
         address: z.string().max(500),
+        address_street: z.string().max(300).optional(),
+        address_locality: z.string().max(100).optional(),
+        address_region: z.string().max(100).optional(),
+        address_postal_code: z.string().max(20).optional(),
+        address_country: z
+          .union([
+            z.string().regex(/^[A-Za-z]{2}$/, 'Use a two-letter country code'),
+            z.literal(''),
+          ])
+          .optional(),
+        privacy_contact_email: z.union([z.email(), z.literal('')]).optional(),
+        privacy_retention: z.string().max(2000).optional(),
+        privacy_reviewed_on: z.union([z.iso.date(), z.literal('')]).optional(),
+
         hours: z.string().max(300),
         instagram: z.union([httpsUrl, z.literal('')]),
       }),
@@ -464,6 +478,15 @@ export const specs: Record<string, ModuleSpec> = {
       f('public.phone', 'Phone', 'tel', false),
       f('public.whatsapp', 'WhatsApp', 'tel', false),
       f('public.address', 'Verified address', 'textarea', false),
+      f('public.address_street', 'Verified street address', 'text', false),
+      f('public.address_locality', 'City / locality', 'text', false),
+      f('public.address_region', 'State / region', 'text', false),
+      f('public.address_postal_code', 'Postal code', 'text', false),
+      f('public.address_country', 'Country code (two letters)', 'text', false),
+      f('public.privacy_contact_email', 'Privacy contact email', 'email', false),
+      f('public.privacy_retention', 'Owner-approved data retention wording', 'textarea', false),
+      f('public.privacy_reviewed_on', 'Privacy notice reviewed on', 'date', false),
+
       f('public.hours', 'Opening hours', 'text', false),
       f('public.instagram', 'Instagram', 'url', false),
     ],

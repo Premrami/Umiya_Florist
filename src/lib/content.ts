@@ -1,6 +1,8 @@
-import { configured, supabase } from './supabase/server';
+import { configured } from './supabase/server';
+import { createClient } from '@supabase/supabase-js';
+import { PUBLIC_CONTENT_MAX_AGE, PUBLIC_CONTENT_TAG } from './public-cache';
 import { referenceCatalog, type PublicContent } from './public-content';
-export async function publicContent(): Promise<PublicContent> {
+export async function publicContent({ fresh = false } = {}): Promise<PublicContent> {
   if (!configured())
     return {
       preview: true,
@@ -13,7 +15,27 @@ export async function publicContent(): Promise<PublicContent> {
       social: [],
       faqs: [],
     };
-  const db = await supabase();
+  // Public renders must never depend on a visitor's authentication cookies.
+  // Only published tables/views are queried, using the anonymous key, never service-role access.
+  const db = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      global: {
+        fetch: (url, init) =>
+          fetch(url, {
+            ...init,
+            ...(fresh
+              ? { cache: 'no-store' as const }
+              : {
+                  cache: 'force-cache' as const,
+                  next: { revalidate: PUBLIC_CONTENT_MAX_AGE, tags: [PUBLIC_CONTENT_TAG] },
+                }),
+          }),
+      },
+    },
+  );
   const results = await Promise.all([
     db.from('catalog_items').select('*').eq('status', 'published').order('sort_order'),
     db.from('public_site_sections').select('*'),

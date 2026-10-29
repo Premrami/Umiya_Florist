@@ -1,3 +1,4 @@
+import { invalidatePublicContent } from '@/lib/public-cache';
 import { sameOrigin } from '@/lib/origin';
 import { z } from 'zod';
 import { createHash, randomBytes } from 'node:crypto';
@@ -386,6 +387,7 @@ export async function POST(req: Request) {
       }
     }
     if (error) throw error;
+    if (p.action === 'publish' || p.action === 'delete_section') invalidatePublicContent('cms');
     return Response.json({ data: result ?? null });
   } catch (e) {
     return apiError(e);

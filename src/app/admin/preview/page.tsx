@@ -14,7 +14,7 @@ export default async function Preview() {
   } catch {
     redirect('/login');
   }
-  const content = await publicContent();
+  const content = await publicContent({ fresh: true });
   const { data, error } = await auth.db.from('site_sections').select('key,draft');
   if (error) throw error;
   content.sections = {

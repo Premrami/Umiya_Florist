@@ -1,6 +1,6 @@
 # Architecture
 
-One Next.js 16 App Router project with React 19, strict TypeScript, Tailwind v4, GSAP and Lucide. Local Cormorant Garamond and Manrope fonts avoid external font requests. A static floral composition is the honest fallback for missing bloom footage; no WebGL scene or photorealistic growth is claimed.
+One Next.js 16 App Router project with React 19, strict TypeScript, Tailwind v4, GSAP and Lucide. The approved Fraunces and DM Sans fonts are self-hosted with next/font/local; public published content uses anonymous, tagged fetch caching with immediate invalidation after successful CMS changes. A static floral composition is the honest fallback for missing bloom footage; no WebGL scene or photorealistic growth is claimed.
 
 `src/components/website.tsx` provides the single-page public experience. `src/lib/content.ts` reads only published records and restricted public views. Dynamic rendering reflects published CMS updates without redeployment. Draft preview requires the content permission.
 

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import { WebVitals } from '@/components/web-vitals';
 import './globals.css';
 import './brand-theme.css';
 const displayFont = localFont({
@@ -32,7 +33,10 @@ export const metadata: Metadata = {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        {process.env.NEXT_PUBLIC_ENABLE_WEB_VITALS === 'true' && <WebVitals />}
+      </body>
     </html>
   );
 }

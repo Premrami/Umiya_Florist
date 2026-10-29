@@ -21,3 +21,8 @@ This inspection precedes implementation. Baseline was captured from the producti
 Baseline: every inspected page has one H1; public content is server-rendered, including without JavaScript. Public cards/forms, Studio role checks, origin checks, database RLS, scoped service credentials, private media, signed invoice links, and webhook verification exist. Security implementation will be reviewed and tested, not represented as a penetration-test certification.
 
 Artifacts: baseline screenshots, axe results and Lighthouse JSON retained in the audit output folder after verification. Full responsive checks will cover 320, 375, 390, 430, 768, 1024, 1280, 1440 and 1920 px, plus mobile breakpoint boundaries.
+
+
+## Implementation update — 29 October 2026
+
+The original findings above are retained for traceability. Current technical fixes, executed test results and all deduplicated issue statuses are recorded in the [original audit reconciliation](report.md). Totals: 46 items; 23 FIXED, 7 PARTIALLY FIXED, 14 BLOCKED, 2 NOT APPLICABLE. Historical feature/accounting/infrastructure backlog remains explicitly tracked (R35–R45), rather than treated as verified production behavior. Final mobile LCP is 4.22s median (target not yet met); field INP and physical assistive-device acceptance remain unverified. No deployment or real external transactions were performed.

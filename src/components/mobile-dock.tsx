@@ -50,7 +50,10 @@ export function MobileDock({ label, items }: { label: string; items: DockItem[] 
             key={id}
             type="button"
             className={className}
-            onClick={onClick}
+            onClick={(event) => {
+              event.currentTarget.focus({ preventScroll: true });
+              onClick?.();
+            }}
             aria-expanded={expanded}
             aria-haspopup="dialog"
           >

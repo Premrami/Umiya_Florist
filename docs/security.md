@@ -17,3 +17,14 @@
 Exercise RLS through the actual Supabase Data API and Storage service; configure and verify MFA/session policy; run a real invitation/reset flow; add staging load/concurrency tests and upload malware scanning where appropriate; review CSP for deployment-specific image/monitoring domains; validate backup restore and incident contacts. Accountants now use a narrow billing-identity function instead of direct customer-table access. Assignment-scoped field-staff access remains outstanding. Do not activate the reserved staff role for operational use.
 
 This is not an independent penetration test, legal certification or production security sign-off.
+
+
+## Implementation additions — 29 October 2026
+
+Published-content caching uses a stateless anonymous-key client and published views/tables, never a visitor session or service-role key. Authorized public-module writes invalidate the shared cache. Owner-only readiness returns checks and suggested actions without credential values; authorization occurs before settings reads.
+
+An enforced compatible CSP now restricts sources, objects, frames, base URLs and forms. Next/GSAP still require the documented inline allowances; this is not a nonce/hash strict CSP. Validate actual hosting, images and optional monitoring before tightening it. HSTS is gated on a valid production HTTPS origin; development permits the framework evaluator and local HTTP.
+
+Optional first-party vitals are disabled by default, respect Do Not Track, restrict path/metric fields, enforce same origin and a 1KB request limit. They do not include queries, metric IDs or inquiry data. Logging/hosting retention and abuse monitoring still require deployment review; this is not an analytics consent determination.
+
+Local compiled-public-asset scanning found no configured secret values in the checked output. This is a regression boundary check, not comprehensive penetration testing. Real Supabase transport/RLS, MFA/recovery, backup restoration and provider acceptance remain staging requirements.

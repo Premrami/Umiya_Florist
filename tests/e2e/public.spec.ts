@@ -79,7 +79,7 @@ test('mobile More and desktop menu retain keyboard close and focus return', asyn
   page,
 }, info) => {
   await page.goto('/?intro=0');
-  if (info.project.name === 'mobile') {
+  if (info.project.name.endsWith('mobile')) {
     const dock = page.getByRole('navigation', { name: 'Mobile navigation', exact: true });
     expect(await dock.locator('.dock-item').allTextContents()).toEqual([
       'Home',
@@ -126,4 +126,35 @@ test('branded 404 and privacy metadata', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toContainText('out of place');
   await page.goto('/privacy');
   await expect(page).toHaveTitle('Privacy | Umiya Florist');
+});
+
+test('full flower-to-logo sequence survives lazy loading', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.addInitScript(() => {
+    const state = { seed: false, flower: false, bud: false, opened: false };
+    (window as any).__introChecks = state;
+    let started = false;
+    const timer = setInterval(() => {
+      const intro = document.querySelector('.brand-intro');
+      if (intro) started = true;
+      const seed = document.querySelector<SVGElement>('.intro-seed');
+      const flower = document.querySelector('.intro-flower-heart');
+      const bud = document.querySelector('.intro-y-bud');
+      if (seed?.style.transform) state.seed = true;
+      if (flower && Number(getComputedStyle(flower).opacity) > 0.9) state.flower = true;
+      if (bud?.getAttribute('transform') === 'scale(1)') state.bud = true;
+      if (started && !intro) {
+        state.opened = true;
+        clearInterval(timer);
+      }
+    }, 40);
+  });
+  await page.goto('/?intro=1');
+  await page.waitForFunction(() => (window as any).__introChecks.opened, { timeout: 20000 });
+  expect(await page.evaluate(() => (window as any).__introChecks)).toEqual({
+    seed: true,
+    flower: true,
+    bud: true,
+    opened: true,
+  });
 });

@@ -1,3 +1,4 @@
+import { invalidatePublicContent } from '@/lib/public-cache';
 import { z } from 'zod';
 import { sameOrigin } from '@/lib/origin';
 import { authorize, apiError } from '@/lib/auth';
@@ -80,6 +81,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ module: string
       : db.from(spec.table).insert(clean);
     const { data, error } = await query.select().single();
     if (error) throw error;
+    invalidatePublicContent(module);
     return Response.json({ data });
   } catch (e) {
     return apiError(e);

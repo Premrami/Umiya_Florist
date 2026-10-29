@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: 'tests/e2e',
   use: {
@@ -13,6 +13,45 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
+    ...(process.env.PLAYWRIGHT_CROSS_BROWSER === '1'
+      ? [
+          {
+            name: 'firefox-desktop',
+            use: {
+              browserName: 'firefox' as const,
+              launchOptions: {},
+              viewport: { width: 1440, height: 1000 },
+            },
+          },
+          {
+            name: 'firefox-mobile',
+            use: {
+              browserName: 'firefox' as const,
+              launchOptions: {},
+              viewport: { width: 390, height: 844 },
+            },
+          },
+          {
+            name: 'webkit-desktop',
+            use: {
+              browserName: 'webkit' as const,
+              launchOptions: {},
+              viewport: { width: 1440, height: 1000 },
+            },
+          },
+          {
+            name: 'webkit-mobile',
+            use: {
+              browserName: 'webkit' as const,
+              launchOptions: {},
+              viewport: { width: 390, height: 844 },
+              isMobile: true,
+              hasTouch: true,
+            },
+          },
+        ]
+      : []),
+
     { name: 'desktop', use: { viewport: { width: 1440, height: 1000 } } },
     {
       name: 'mobile',

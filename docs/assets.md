@@ -12,7 +12,7 @@ Bundled reference files were downloaded from Unsplash on 19 October 2026:
 
 Unsplash's published license allows downloading and commercial use, with its stated restrictions: https://unsplash.com/license . Keep the source register and review asset-specific rights/representations before commercial launch.
 
-Cormorant Garamond and Manrope are self-hosted through Fontsource packages under the SIL Open Font License; preserve package LICENSE files. Lucide uses the ISC license. No Dribbble artwork is included in the shipped assets. The linked Flora reference informed color/editorial direction; the additional named screenshot references were not attached.
+Fraunces and DM Sans are self-hosted through the existing Fontsource assets and next/font/local under the SIL Open Font License. Preserve their licenses. Legacy unused UI Fontsource packages were removed; bundled PDF fonts and their license files remain unchanged. Lucide uses the ISC license. No Dribbble artwork is included in the shipped assets. The linked Flora reference informed color/editorial direction; the additional named screenshot references were not attached.
 
 A professionally produced flower bloom video or suitable organic petal model was not supplied. The shipped hero uses photography with a coordinated reveal, never describes image scaling as flower growth, and supports reduced motion. Detailed 3D/bloom footage remains an asset-dependent task.
 

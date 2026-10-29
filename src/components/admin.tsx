@@ -1,9 +1,10 @@
 'use client';
 import { FormInput } from './form-input';
+import { LaunchReadiness } from './launch-readiness';
 import Link from 'next/link';
 import { MobileDock } from './mobile-dock';
 import { InquiryAlertPanel } from './inquiry-alert-panel';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useId } from 'react';
 import {
   Flower2,
   LayoutDashboard,
@@ -88,7 +89,8 @@ async function api(path: string, body?: unknown) {
       : {}),
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(json.error ?? 'Request failed');
+  if (!res.ok)
+    throw Object.assign(new Error(json.error ?? 'Request failed'), { field: json.field });
   return json;
 }
 const moneyFields = [
@@ -791,7 +793,12 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
                   )}
                 </div>
               </div>
-              {module === 'settings' && <ConfigurationStatus />}
+              {module === 'settings' && (
+                <>
+                  <ConfigurationStatus />
+                  <LaunchReadiness />
+                </>
+              )}
               {module === 'inquiries' && can(profile.role, 'owner') && <InquiryAlertPanel />}
               {module === 'events' && <EventCalendar onOpen={(row) => showDetail(row)} />}
               {module === 'staff' && (
@@ -1145,11 +1152,13 @@ function FormDialog({
 }) {
   const [error, setError] = useState(''),
     [busy, setBusy] = useState(false);
+  const errorId = useId();
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true);
     setError('');
-    const flat = Object.fromEntries(new FormData(e.currentTarget)),
+    const form = e.currentTarget;
+    const flat = Object.fromEntries(new FormData(form)),
       data: Row = {};
     for (const f of fields) if (f.type === 'checkbox') flat[f.key] = flat[f.key] ? 'true' : '';
     for (const [k, v] of Object.entries(flat)) {
@@ -1164,6 +1173,14 @@ function FormDialog({
     try {
       await onSave(data);
     } catch (e) {
+      if (e instanceof Error && 'field' in e && typeof e.field === 'string') {
+        const field = form.elements.namedItem(e.field);
+        if (field instanceof HTMLElement) {
+          field.setAttribute('aria-invalid', 'true');
+          field.setAttribute('aria-describedby', errorId);
+          field.focus();
+        }
+      }
       setError(e instanceof Error ? e.message : 'Could not save');
     } finally {
       setBusy(false);
@@ -1171,7 +1188,15 @@ function FormDialog({
   }
   return (
     <Dialog title={title} onClose={onClose}>
-      <form className="admin-form" onSubmit={submit}>
+      <form
+        className="admin-form"
+        onSubmit={submit}
+        onInput={(event) => {
+          const field = event.target as HTMLElement;
+          field.removeAttribute('aria-invalid');
+          field.removeAttribute('aria-describedby');
+        }}
+      >
         {fields.map((f) => {
           const val = f.key.split('.').reduce<any>((v, k) => v?.[k], initial) ?? '';
           return (
@@ -1219,7 +1244,7 @@ function FormDialog({
           );
         })}
         {error && (
-          <p role="alert" className="admin-alert">
+          <p id={errorId} role="alert" className="admin-alert">
             {error}
           </p>
         )}

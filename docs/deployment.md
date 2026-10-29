@@ -27,3 +27,14 @@ No live deployment has been performed. Use separate development, staging and pro
 ## Rollback
 
 Keep the prior Vercel deployment available. Prefer additive schema changes; take backups before migrations. Roll back application deployment first when possible. Never blindly reverse a financial migration or drop ledgers. Restore to a separate Supabase project, reconcile new payments received since the backup, and verify before switching connections.
+
+
+## Release gate, published cache and factual settings
+
+Before a launch build run `npm run check:release` and then `npm run build:release`. The configuration gate checks presence without printing secret values; it does not prove provider delivery or production acceptance. A real `NEXT_PUBLIC_APP_URL` HTTPS origin is required. `ENFORCE_CANONICAL_HOST=true` optionally redirects the equivalent www/apex host; enable only after domain ownership and hosting routing are verified. Production HSTS is emitted only with a valid public HTTPS origin. Review the full redirect/certificate chain on the actual host.
+
+Public home/privacy pages cache anonymous published content for 60 seconds. Successful authorized Studio changes to public modules invalidate that cache; direct database edits become visible through timed revalidation. Protected preview bypasses it. Never add session-dependent or private content to this cache.
+
+In Studio Settings complete the structured street/city/state/postcode/two-letter country fields and privacy contact/approved retention wording/review date. The owner-only launch panel shows missing configuration; completing it is not a legal/security sign-off. No business facts are invented.
+
+`NEXT_PUBLIC_ENABLE_WEB_VITALS` is off by default. If approved, enable it at build time only after reviewing privacy notice and log access/retention. It sends bounded first-party LCP/INP/CLS records for home/privacy without query strings or customer values; host access logs may separately contain network metadata. Establish aggregation before claiming field thresholds.
