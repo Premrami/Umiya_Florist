@@ -1,5 +1,8 @@
 'use client';
+import { FormInput } from './form-input';
 import Link from 'next/link';
+import { MobileDock } from './mobile-dock';
+import { InquiryAlertPanel } from './inquiry-alert-panel';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   Flower2,
@@ -168,6 +171,17 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
       previous?.focus();
     };
   }, [mobile]);
+  const dockModules = [
+    'dashboard',
+    'inquiries',
+    'clients',
+    'cms',
+    'catalog',
+    'deliveries',
+    'marketing',
+  ]
+    .filter((item) => !specs[item] || can(profile.role, specs[item].permission))
+    .slice(0, 3);
   const spec = specs[module],
     title =
       module === 'dashboard'
@@ -209,6 +223,8 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
     try {
       const r = await api('/api/admin/actions', { action: name, ...data });
       setNotice('Saved successfully.');
+      if (name === 'delete_section') setNotice('Section deleted successfully.');
+      if (name === 'delete_inquiry') setNotice('Inquiry deleted successfully.');
       if (name === 'share') setShare(r.data);
       if (name === 'link') setNotice('Payment link created: ' + r.data.url);
       await load();
@@ -291,10 +307,26 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
           Convert to client
         </button>
       )}
-      {module === 'cms' && (
-        <button onClick={() => run('publish', { id: row.id }).catch(() => {})}>
-          Publish draft
+      {module === 'inquiries' && can(profile.role, 'crm') && (
+        <button
+          className="delete-section"
+          onClick={() => setAction({ name: 'delete_inquiry', row })}
+        >
+          Delete
         </button>
+      )}
+      {module === 'cms' && (
+        <>
+          <button onClick={() => run('publish', { id: row.id }).catch(() => {})}>
+            Publish draft
+          </button>
+          <button
+            className="delete-section"
+            onClick={() => setAction({ name: 'delete_section', row })}
+          >
+            Delete
+          </button>
+        </>
       )}
       {module === 'subscriptions' && (
         <>
@@ -402,11 +434,12 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
         aria-label="Studio navigation"
         className={mobile ? 'admin-sidebar open' : 'admin-sidebar'}
       >
-        <Link href="/" className="admin-brand">
-          <Flower2 size={30} />
-          <span>
-            UMIYA<small>THE FLORAL STUDIO</small>
-          </span>
+        <Link
+          href="/"
+          className="admin-brand"
+          aria-label="Umiya Florist — Flowers for every occasion — Home"
+        >
+          <span className="admin-brand-logo" aria-hidden="true" />
         </Link>
         <button
           className="sidebar-close"
@@ -416,7 +449,7 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
           <X />
         </button>
         <div className="sidebar-label">WORKSPACE</div>
-        <nav>
+        <nav aria-label="Studio sections">
           {modules.map((m, i) => {
             if (
               (specs[m] && !can(profile.role, specs[m].permission)) ||
@@ -425,7 +458,13 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
               return null;
             const Icon = icons[i] ?? Flower2;
             return (
-              <Link key={m} href={'/admin/' + m} className={m === module ? 'active' : ''}>
+              <Link
+                key={m}
+                href={'/admin/' + m}
+                className={m === module ? 'active' : ''}
+                aria-current={m === module ? 'page' : undefined}
+                onClick={() => setMobile(false)}
+              >
                 <Icon size={17} strokeWidth={1.5} />
                 {names[i] ?? specs[m]?.title}
               </Link>
@@ -454,6 +493,37 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
           onClick={() => setMobile(false)}
         />
       )}
+      <MobileDock
+        label="Studio quick navigation"
+        items={[
+          ...dockModules.map((item) => ({
+            id: item,
+            label:
+              (
+                {
+                  dashboard: 'Home',
+                  cms: 'Content',
+                  catalog: 'Catalog',
+                  deliveries: 'Delivery',
+                } as Record<string, string>
+              )[item] ??
+              specs[item]?.title ??
+              item,
+            href: '/admin/' + item,
+            icon: icons[modules.findIndex((entry) => entry === item)] ?? Flower2,
+            active: module === item && !mobile,
+            onClick: () => setMobile(false),
+          })),
+          {
+            id: 'more',
+            label: 'More',
+            icon: Menu,
+            onClick: () => setMobile((open) => !open),
+            expanded: mobile,
+            active: mobile || !dockModules.includes(module),
+          },
+        ]}
+      />
       <div className="admin-main">
         <header className="admin-header">
           <button
@@ -683,7 +753,7 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
                 ].includes(module) && (
                   <label className="search-box">
                     <Search size={16} />
-                    <input
+                    <FormInput
                       aria-label="Search records"
                       placeholder={'Search ' + title?.toLowerCase() + '…'}
                       value={search}
@@ -722,6 +792,7 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
                 </div>
               </div>
               {module === 'settings' && <ConfigurationStatus />}
+              {module === 'inquiries' && can(profile.role, 'owner') && <InquiryAlertPanel />}
               {module === 'events' && <EventCalendar onOpen={(row) => showDetail(row)} />}
               {module === 'staff' && (
                 <button className="admin-btn" onClick={() => setAction({ name: 'invite' })}>
@@ -741,14 +812,14 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
                 </div>
               )}
               {module === 'cms' && (
-                <a className="admin-btn secondary" href="/admin/preview" target="_blank">
-                  Preview unpublished website ↗
-                </a>
-              )}
-              {module === 'cms' && (
-                <div className="admin-info">
-                  Edits are saved as drafts. Review the draft details, then explicitly publish. Only
-                  published snapshots appear on the website.
+                <div className="cms-guidance">
+                  <a className="admin-btn secondary" href="/admin/preview" target="_blank">
+                    Preview unpublished website ↗
+                  </a>
+                  <div className="admin-info">
+                    Edits are saved as drafts. Review the draft details, then explicitly publish.
+                    Only published snapshots appear on the website.
+                  </div>
                 </div>
               )}
               <div className="data-panel">
@@ -772,7 +843,9 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
                       <thead>
                         <tr>
                           {spec.columns.map((k) => (
-                            <th key={k}>{human(k)}</th>
+                            <th key={k} scope="col">
+                              {human(k)}
+                            </th>
                           ))}
                           <th>Actions</th>
                         </tr>
@@ -819,9 +892,9 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
             </>
           )}
         </main>
-        <div className="admin-footer">
+        <footer className="admin-footer">
           Thoughtfully organised. Beautifully in bloom.<span>UMIYA STUDIO</span>
-        </div>
+        </footer>
       </div>
       {edit && module === 'quotations' && (
         <QuotationDialog
@@ -838,6 +911,7 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
         <FormDialog
           title={edit.id ? 'Edit ' + title : 'Add ' + title}
           fields={spec.fields}
+          preserveEmptyNested={module === 'settings'}
           initial={edit}
           customers={customers}
           onClose={() => setEdit(null)}
@@ -1059,9 +1133,11 @@ function FormDialog({
   customers,
   onClose,
   onSave,
+  preserveEmptyNested = false,
 }: {
   title: string;
   fields: Field[];
+  preserveEmptyNested?: boolean;
   initial: Row;
   customers: Row[];
   onClose: () => void;
@@ -1077,11 +1153,13 @@ function FormDialog({
       data: Row = {};
     for (const f of fields) if (f.type === 'checkbox') flat[f.key] = flat[f.key] ? 'true' : '';
     for (const [k, v] of Object.entries(flat)) {
+      const checkbox = fields.find((f) => f.key === k)?.type === 'checkbox';
+      const value = checkbox ? v === 'true' : v;
       if (k.includes('.')) {
         const [a, b] = k.split('.');
         data[a] ??= {};
-        if (v !== '') data[a][b] = v;
-      } else data[k] = fields.find((f) => f.key === k)?.type === 'checkbox' ? v === 'true' : v;
+        if (preserveEmptyNested || checkbox || v !== '') data[a][b] = value;
+      } else data[k] = value;
     }
     try {
       await onSave(data);
@@ -1100,7 +1178,7 @@ function FormDialog({
             <label key={f.key}>
               {f.label}
               {f.type === 'checkbox' ? (
-                <input name={f.key} type="checkbox" defaultChecked={!!val} value="true" />
+                <FormInput name={f.key} type="checkbox" defaultChecked={!!val} value="true" />
               ) : f.type === 'select' || f.type === 'customer' ? (
                 <select name={f.key} defaultValue={val} required={f.required}>
                   <option value="">Select…</option>
@@ -1119,12 +1197,22 @@ function FormDialog({
               ) : f.type === 'textarea' ? (
                 <textarea name={f.key} defaultValue={val} required={f.required} rows={3} />
               ) : (
-                <input
+                <FormInput
                   name={f.key}
                   defaultValue={val}
                   required={f.required}
                   type={f.type ?? 'text'}
-                  step={f.type === 'number' ? 'any' : undefined}
+                  step={f.type === 'number' ? (f.step ?? 1) : undefined}
+                  min={f.type === 'number' ? (f.min ?? 0) : undefined}
+                  max={f.type === 'number' ? (f.max ?? 1e12) : undefined}
+                  pattern={
+                    f.type === 'tel'
+                      ? f.key === 'private.inquiry_alert_phone'
+                        ? String.raw`\+[1-9][0-9]{7,14}`
+                        : String.raw`\+?[1-9][0-9]{9,14}`
+                      : undefined
+                  }
+                  maxLength={f.type === 'tel' ? 16 : undefined}
                 />
               )}
             </label>
@@ -1184,7 +1272,15 @@ function ActionDialog({
       { key: 'reference', label: 'Receipt / transaction reference', required: true },
     ],
     stock: [
-      { key: 'quantity', label: 'Quantity (+ received / - used)', type: 'number', required: true },
+      {
+        key: 'quantity',
+        label: 'Quantity (+ received / - used)',
+        type: 'number',
+        required: true,
+        min: -1e6,
+        max: 1e6,
+        step: 'any',
+      },
       {
         key: 'reason',
         label: 'Reason',
@@ -1206,6 +1302,7 @@ function ActionDialog({
         key: 'amount',
         label: 'Adjustment in paise (+ charge / - discount)',
         type: 'number',
+        min: -1e12,
         required: true,
       },
     ],
@@ -1249,7 +1346,7 @@ function ActionDialog({
     ],
     subscription_item: [
       { key: 'name', label: 'Flower item', required: true },
-      { key: 'quantity', label: 'Quantity', type: 'number', required: true },
+      { key: 'quantity', label: 'Quantity', type: 'number', required: true, min: 1, max: 10000 },
       { key: 'amount', label: 'Unit price (paise)', type: 'number', required: true },
     ],
     price: [
@@ -1267,6 +1364,15 @@ function ActionDialog({
     ],
     finalize: [],
   };
+  if (action === 'delete_section' || action === 'delete_inquiry')
+    return (
+      <DeleteSectionDialog
+        row={row!}
+        inquiry={action === 'delete_inquiry'}
+        onClose={onClose}
+        onSubmit={onSubmit}
+      />
+    );
   if (action === 'attachment')
     return <UploadDialog eventId={row?.id} onClose={onClose} onSubmit={onSubmit} />;
   if (action === 'upload') return <UploadDialog onClose={onClose} onSubmit={onSubmit} />;
@@ -1289,6 +1395,65 @@ function ActionDialog({
         })
       }
     />
+  );
+}
+function DeleteSectionDialog({
+  row,
+  inquiry = false,
+  onClose,
+  onSubmit,
+}: {
+  row: Row;
+  inquiry?: boolean;
+  onClose: () => void;
+  onSubmit: (v: Row) => Promise<void>;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  return (
+    <Dialog
+      title={inquiry ? `Delete inquiry from “${row.name}”?` : `Delete section “${row.key}”?`}
+      onClose={onClose}
+    >
+      <p className="admin-info">
+        {inquiry
+          ? 'This permanently deletes this inquiry and its saved alert records. Linked clients stay in Studio. This cannot be undone.'
+          : 'This permanently deletes this section’s saved draft, published content, and revision history. The website will use its default content where available. This cannot be undone.'}
+      </p>
+      {error && (
+        <p className="admin-alert" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="toolbar">
+        <button className="admin-btn secondary" disabled={busy} onClick={onClose}>
+          Cancel
+        </button>
+        <button
+          className="admin-btn danger"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            setError('');
+            try {
+              await onSubmit({});
+            } catch (e) {
+              setError(
+                e instanceof Error
+                  ? e.message
+                  : inquiry
+                    ? 'Could not delete the inquiry.'
+                    : 'Could not delete the section.',
+              );
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          {busy ? 'Deleting…' : inquiry ? 'Delete inquiry' : 'Delete section'}
+        </button>
+      </div>
+    </Dialog>
   );
 }
 function UploadDialog({
@@ -1336,7 +1501,7 @@ function UploadDialog({
       >
         <label>
           Image
-          <input
+          <FormInput
             name="file"
             type="file"
             accept={
@@ -1350,7 +1515,7 @@ function UploadDialog({
         {!eventId && (
           <label>
             Image description / alt text
-            <input name="alt" required maxLength={500} />
+            <FormInput name="alt" required maxLength={500} />
           </label>
         )}
         <button className="admin-btn" disabled={busy}>
@@ -1400,7 +1565,7 @@ function QuotationDialog({
       >
         <label>
           Title
-          <input name="name" defaultValue={row.name ?? ''} required />
+          <FormInput name="name" defaultValue={row.name ?? ''} required />
         </label>
         <label>
           Client
@@ -1415,14 +1580,14 @@ function QuotationDialog({
         </label>
         <label>
           Valid until
-          <input name="valid_until" type="date" defaultValue={row.valid_until ?? ''} required />
+          <FormInput name="valid_until" type="date" defaultValue={row.valid_until ?? ''} required />
         </label>
         <div className="quote-lines">
           {items.map((item, i) => (
             <div className="quote-line" key={i}>
               <label>
                 Description
-                <input
+                <FormInput
                   aria-label={'Line ' + (i + 1) + ' description'}
                   value={item.description}
                   required
@@ -1435,7 +1600,7 @@ function QuotationDialog({
               </label>
               <label>
                 Quantity
-                <input
+                <FormInput
                   aria-label={'Line ' + (i + 1) + ' quantity'}
                   type="number"
                   min={1}
@@ -1453,7 +1618,7 @@ function QuotationDialog({
               </label>
               <label>
                 Unit price (paise)
-                <input
+                <FormInput
                   aria-label={'Line ' + (i + 1) + ' unit price'}
                   type="number"
                   min={0}
@@ -1518,7 +1683,7 @@ function EventCalendar({ onOpen }: { onOpen: (r: Row) => void }) {
         <h2>Event calendar</h2>
         <label>
           Month{' '}
-          <input
+          <FormInput
             aria-label="Calendar month"
             type="month"
             value={month}

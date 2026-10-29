@@ -1,0 +1,675 @@
+/* One brand system: cranberry packaging, warm paper, and deep wine florals. */
+:root {
+  --brand-red: #931b32;
+  --brand-wine: #650d1b;
+  --brand-deep: #33070d;
+  --brand-beige: #e0c5ac;
+  --brand-paper: #faf4ec;
+  --brand-ink: #40242a;
+  --brand-muted: #765d60;
+  --brand-border: #dbc9bd;
+  --wine: var(--brand-deep);
+  --burgundy: var(--brand-wine);
+  --ivory: var(--brand-paper);
+  --gold: var(--brand-beige);
+  --muted: #dfc8c3;
+  --line: #e0c5ac40;
+}
+body {
+  background: var(--brand-deep);
+}
+::selection {
+  background: var(--brand-red);
+  color: var(--brand-paper);
+}
+.site-header {
+  background: #4d0915f5;
+  border-bottom-color: #e0c5ac30;
+}
+.site-header nav {
+  color: var(--brand-paper);
+}
+.hero {
+  background: var(--brand-wine);
+}
+.image-shade {
+  background:
+    linear-gradient(90deg, #650d1b, #650d1b99 30%, #33070d20 70%),
+    linear-gradient(0deg, #33070dbb, transparent 55%);
+}
+.hero h1 em {
+  color: var(--brand-beige);
+}
+.hero-copy > p {
+  color: #f0ddd2;
+}
+.hero-image img {
+  filter: brightness(0.78) saturate(0.9);
+}
+.hero-caption,
+.scroll-note,
+.hero-edition {
+  color: #dfc5b5;
+}
+.ribbon {
+  background: var(--brand-deep);
+}
+.website .button {
+  background: var(--brand-red);
+  border-color: var(--brand-beige);
+  color: var(--brand-paper);
+  border-radius: 999px;
+  padding-inline: 25px;
+  font-weight: 500;
+}
+.website .button:is(:hover, :focus-visible) {
+  background: var(--brand-beige);
+  color: var(--brand-deep);
+  border-color: var(--brand-beige);
+}
+.website .button.light {
+  background: var(--brand-paper);
+  color: var(--brand-wine);
+  border-color: var(--brand-paper);
+}
+.website .text-link {
+  border-bottom-color: #e0c5ac66 !important;
+}
+.about,
+.work,
+.contact,
+.social,
+.faq-section {
+  background: var(--brand-paper);
+  color: var(--brand-ink);
+}
+:is(.about, .work, .contact, .social, .faq-section) :is(h2, h3) {
+  color: var(--brand-wine);
+}
+:is(.about, .work, .contact, .social, .faq-section) :is(p, .quiet, .contact-details) {
+  color: var(--brand-muted);
+}
+:is(.about, .work, .contact, .social, .faq-section)
+  :is(.eyebrow, em, .signature, .text-link, .privacy-note a) {
+  color: var(--brand-red);
+}
+.website
+  :is(.about, .work, .contact, .social, .faq-section)
+  a:not(.button):is(:hover, :focus-visible) {
+  color: var(--brand-wine);
+}
+.website :is(.about, .work, .contact, .social, .faq-section) .text-link {
+  border-color: #931b3240 !important;
+}
+.about-image img {
+  filter: saturate(0.85) brightness(0.94);
+}
+.image-stamp {
+  background: var(--brand-wine);
+  color: var(--brand-beige);
+  border-color: var(--brand-beige);
+}
+.image-stamp em {
+  color: var(--brand-paper);
+}
+.collections {
+  background: var(--brand-wine);
+  color: var(--brand-paper);
+}
+.collections :is(h2, h3) {
+  color: var(--brand-paper);
+}
+.collections :is(em, .eyebrow) {
+  color: var(--brand-beige);
+}
+.collections p,
+.flower-card p {
+  color: #dfc8c3;
+}
+.filter-row {
+  border-color: #e0c5ac40;
+}
+.website .collections .filter-row button {
+  color: #ead8cd;
+}
+.website .collections .filter-row button.active {
+  color: var(--brand-beige);
+  border-color: var(--brand-beige) !important;
+}
+.website .collections .filter-row button:is(:hover, :focus-visible) {
+  color: var(--brand-paper);
+  background: #e0c5ac12;
+}
+.website .collections .text-link {
+  color: var(--brand-beige);
+  border-color: #e0c5ac66 !important;
+}
+.flower-photo {
+  background: #7b2030;
+  border-radius: 8px;
+}
+.flower-photo img {
+  filter: saturate(0.95);
+}
+.circle-arrow {
+  background: var(--brand-paper);
+  color: var(--brand-wine);
+}
+.pooja,
+.why {
+  background: var(--brand-beige);
+  color: var(--brand-wine);
+}
+:is(.pooja, .why) :is(h2, h3, em, .eyebrow, small) {
+  color: var(--brand-wine);
+}
+:is(.pooja, .why) p,
+.pooja-tags,
+.pooja-copy > small {
+  color: #65434a;
+}
+.pooja-tags span {
+  border-color: #650d1b4d;
+}
+.pooja .button {
+  border-color: var(--brand-red);
+}
+.why article {
+  border-color: #650d1b40;
+}
+.decorations,
+.testimonials {
+  background: var(--brand-deep);
+  color: var(--brand-paper);
+}
+.event-overlay {
+  background: linear-gradient(90deg, #33070de6, #33070d45 70%, transparent);
+}
+.event-feature {
+  border: 1px solid #e0c5ac30;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.event-tabs button {
+  color: #dfc8c3;
+}
+.event-tabs button.active {
+  color: var(--brand-beige);
+  border-color: var(--brand-beige);
+}
+.event-feature em,
+.testimonials em {
+  color: var(--brand-beige);
+}
+.work-note {
+  border-color: var(--brand-border);
+}
+.work-note > svg {
+  color: var(--brand-red);
+}
+.portfolio-grid :is(img, button) {
+  border-radius: 8px;
+}
+.contact .inquiry-form :is(label, .consent, .privacy-note) {
+  color: #65434a;
+}
+.contact .form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 20px;
+}
+.contact .form-grid label {
+  min-width: 0;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.contact .form-grid :is(input, textarea, select) {
+  background: #fffdf9;
+  color: var(--brand-ink);
+  border: 1px solid var(--brand-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  min-height: 52px;
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.contact .form-grid textarea {
+  min-height: 144px;
+  resize: vertical;
+}
+.contact .form-grid :is(input, textarea)::placeholder {
+  color: #87706c;
+  font-size: 14px;
+  font-weight: 400;
+  opacity: 1;
+}
+.contact .form-grid :is(input, textarea, select):hover {
+  border-color: #b49183;
+}
+.contact .form-grid :is(input, textarea, select):focus-visible {
+  border-color: var(--brand-red);
+  outline-color: var(--brand-red);
+  box-shadow: 0 0 0 4px #931b3210;
+}
+@media (max-width: 600px) {
+  .contact .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+}
+.website :is(input, textarea, select) {
+  accent-color: var(--brand-red);
+}
+.contact .inquiry-form input[type='checkbox'] {
+  accent-color: var(--brand-red);
+}
+.contact .form-status {
+  color: var(--brand-wine);
+}
+.website footer {
+  background: var(--brand-deep);
+  color: var(--brand-paper);
+}
+.footer-bottom {
+  color: #d7bcae;
+}
+.reading-progress span {
+  background: var(--brand-beige);
+}
+.brand-intro {
+  background: var(--brand-deep);
+}
+.intro-ambient {
+  background: radial-gradient(ellipse at 50% 40%, #931b3255, #650d1b22 48%, transparent 75%);
+}
+.intro-edition,
+.intro-kicker,
+.intro-bottom > span {
+  color: var(--brand-beige);
+}
+.intro-caption,
+.intro-bottom button {
+  color: #f0ddd2;
+}
+.inquiry-dialog,
+.collection-dialog,
+.gallery-dialog,
+.mobile-nav {
+  background: var(--brand-deep);
+  color: var(--brand-paper);
+}
+.dialog-close {
+  background: var(--brand-wine) !important;
+}
+.login-page {
+  background: radial-gradient(ellipse at center, var(--brand-wine), var(--brand-deep));
+}
+/* The Studio uses the same pigments on paper rather than dark marketing surfaces. */
+.admin-shell {
+  --text: var(--brand-ink);
+  --muted-admin: var(--brand-muted);
+  background: #f5eee6;
+  color: var(--brand-ink);
+}
+.admin-sidebar,
+.admin-header,
+.metric-card,
+.panel {
+  background: #fffcf7;
+  border-color: var(--brand-border);
+}
+.admin-brand,
+.admin-heading h1,
+.panel h2 {
+  color: var(--brand-wine);
+}
+.admin-sidebar nav > a {
+  color: #70575b;
+}
+.admin-sidebar nav > a.active {
+  background: #f1dfd2;
+  color: var(--brand-wine);
+  border-left-color: var(--brand-red);
+}
+.admin-sidebar nav > a:hover {
+  background: #f5e8dd;
+}
+.sidebar-label,
+.sidebar-bottom,
+.admin-user,
+.admin-heading p {
+  color: var(--brand-muted);
+}
+.admin-eyebrow {
+  color: var(--brand-red);
+}
+.admin-btn {
+  background: var(--brand-red) !important;
+  border-color: var(--brand-red) !important;
+  color: var(--brand-paper) !important;
+}
+.admin-btn.secondary {
+  background: transparent !important;
+  color: var(--brand-wine) !important;
+  border-color: #cbb2a6 !important;
+}
+.admin-btn.danger {
+  background: #fff4f0 !important;
+  color: #982135 !important;
+  border-color: #ddbdba !important;
+}
+.admin-btn.secondary:is(:hover, :focus-visible),
+.admin-shell .row-actions > :is(a, button):is(:hover, :focus-visible) {
+  background: #f1dfd2 !important;
+  border-color: #cbb2a6 !important;
+}
+.admin-dialog {
+  background: #fffcf7;
+  border-color: var(--brand-border);
+  color: var(--brand-ink);
+}
+.admin-dialog :is(input, select, textarea),
+.search-box,
+.admin-table {
+  border-color: var(--brand-border);
+}
+.avatar {
+  background: #f1dfd2;
+  color: var(--brand-wine);
+}
+.mobile-dock {
+  display: none;
+}
+@media (max-width: 459px) {
+  .mobile-dock {
+    position: fixed;
+    z-index: 50;
+    left: 12px;
+    right: 12px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 7px;
+    max-width: 435px;
+    margin-inline: auto;
+    border: 1px solid #fff9;
+    border-radius: 30px;
+    background: #faf4ecf5;
+    box-shadow:
+      0 12px 36px #33070d38,
+      0 2px 8px #33070d12;
+    backdrop-filter: blur(18px);
+  }
+  .mobile-dock .dock-item {
+    flex: 1;
+    min-width: 0;
+    height: 54px;
+    padding: 6px 2px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border: 0 !important;
+    border-radius: 22px;
+    background: transparent;
+    color: var(--brand-wine) !important;
+    font: 500 10px/1.2 var(--font-body);
+    letter-spacing: 0;
+    text-decoration: none;
+    white-space: nowrap;
+    translate: none;
+  }
+  .mobile-dock .dock-item.is-active {
+    background: var(--brand-red) !important;
+    color: var(--brand-paper) !important;
+  }
+  .mobile-dock .dock-item:not(.is-active):is(:hover, :focus-visible) {
+    background: #ead5c5;
+  }
+  .mobile-dock .dock-item:focus-visible {
+    outline: 2px solid var(--brand-wine);
+    outline-offset: 2px;
+  }
+  .mobile-dock .dock-item svg {
+    flex-shrink: 0;
+  }
+  .site-header {
+    justify-content: center;
+    padding-block: 17px;
+  }
+  .site-header .mobile-menu,
+  .admin-header .admin-menu {
+    display: none;
+  }
+  .website footer {
+    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  }
+  .hero .scroll-note {
+    bottom: 105px;
+  }
+  .hero .hero-edition {
+    bottom: 105px;
+  }
+  .hero-image-label {
+    bottom: 130px;
+  }
+  .mobile-nav[open] {
+    inset: auto 12px calc(94px + env(safe-area-inset-bottom));
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+    max-width: calc(100vw - 24px);
+    max-height: 70svh;
+    padding: 28px 20px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: stretch;
+    gap: 6px 16px;
+    border: 1px solid var(--brand-border);
+    border-radius: 25px;
+    background: var(--brand-paper);
+    color: var(--brand-wine);
+  }
+  .mobile-nav[open]::before {
+    content: 'Explore Umiya';
+    grid-column: 1 / -1;
+    margin-bottom: 12px;
+    font: 24px/1.2 var(--font-display);
+    padding-right: 35px;
+  }
+  .mobile-nav > a {
+    font-size: 14px;
+    min-height: 48px;
+    color: var(--brand-wine);
+    border-bottom: 1px solid #dbc9bd;
+    padding-block: 8px;
+  }
+  .mobile-nav > a.mobile-nav-primary {
+    display: none;
+  }
+  .mobile-nav .dialog-close {
+    right: 12px;
+    top: 12px;
+    background: #f1dfd2 !important;
+    color: var(--brand-wine);
+  }
+  .admin-main {
+    margin-left: 0;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+  .admin-content {
+    padding: 26px 16px 40px;
+  }
+  .admin-sidebar {
+    z-index: 65;
+    inset: auto 12px calc(94px + env(safe-area-inset-bottom));
+    width: auto;
+    height: auto;
+    max-height: min(72svh, 620px);
+    padding: 24px 18px 18px;
+    border: 1px solid var(--brand-border);
+    border-radius: 25px;
+    background: var(--brand-paper);
+    box-shadow: 0 16px 55px #33070d40;
+    transform: translateY(24px);
+    visibility: hidden;
+  }
+  .admin-sidebar.open {
+    transform: translateY(0);
+    visibility: visible;
+  }
+  .admin-sidebar .admin-brand {
+    display: none;
+  }
+  .admin-sidebar .sidebar-label {
+    margin: 2px 48px 15px 5px;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--brand-wine);
+  }
+  .admin-sidebar .sidebar-close {
+    right: 10px;
+    top: 10px;
+  }
+  .admin-sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .admin-sidebar nav > a {
+    min-height: 44px;
+    font-size: 11px;
+    padding: 10px 8px;
+    border-radius: 10px;
+  }
+  .admin-sidebar .sidebar-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 15px;
+    padding: 15px 4px 0;
+  }
+  .admin-sidebar .sidebar-bottom :is(a, button) {
+    min-height: 44px;
+    font-size: 10px;
+  }
+  .admin-scrim {
+    z-index: 60;
+    background: #33070d88;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar {
+    transition: none !important;
+  }
+}
+
+/* Contact stays within reach in the phone header; the dock highlights our work. */
+.contact-label-mobile {
+  display: none;
+}
+@media (max-width: 1050px) {
+  .site-header .header-contact {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 44px;
+    padding: 10px 14px;
+    flex-shrink: 0;
+    border: 1px solid var(--brand-beige);
+    border-radius: 999px;
+    background: var(--brand-red);
+    color: var(--brand-paper);
+    font-size: 11px;
+  }
+  .contact-label-desktop {
+    display: none;
+  }
+  .contact-label-mobile {
+    display: inline;
+  }
+  .website .site-header .header-contact:is(:hover, :focus-visible) {
+    background: var(--brand-beige);
+    color: var(--brand-wine);
+  }
+}
+@media (max-width: 459px) {
+  .site-header {
+    justify-content: space-between;
+    gap: 12px;
+    padding-inline: 18px;
+  }
+  .site-header .wordmark {
+    min-width: 0;
+  }
+  .site-header .brand-logo {
+    width: clamp(145px, 48vw, 190px);
+  }
+}
+
+/* Keep inquiry fields comfortably editable in small dialogs. */
+@media (max-width: 600px) {
+  .inquiry-dialog .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.admin-dialog > header h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* AA contrast corrections within the approved wine-and-paper palette. */
+.website .image-stamp em {
+  color: var(--brand-beige);
+}
+.website .contact-details > span {
+  color: #765d60;
+  font-size: 11px;
+}
+.website .flower-card-bottom small {
+  color: var(--brand-beige);
+}
+.website .social figcaption {
+  color: var(--brand-muted);
+}
+/* Secondary Studio information remains readable on paper surfaces. */
+.admin-shell
+  :is(
+    .muted,
+    .table-toolbar > span,
+    .empty-state > p,
+    .pagination > span,
+    .admin-footer,
+    .admin-footer > span,
+    .sidebar-label,
+    .metric-card small,
+    .panel > p,
+    .panel-heading p,
+    .chart-legend,
+    .chart-month > span,
+    th
+  ),
+.admin-dialog :is(.admin-form > label, .quote-line label) {
+  color: var(--brand-muted);
+}
+.admin-shell .badge {
+  color: #5d463a;
+}
+.admin-shell .badge:is(.active, .delivered, .published, .finalized) {
+  color: #315b3c;
+}
+.admin-shell .badge:is(.pending, .draft, .new) {
+  color: #795322;
+}
+.admin-shell :is(.table-toolbar > span, .pagination > span, .admin-footer > span) {
+  font-size: 11px;
+}
+.admin-dialog .admin-form > label {
+  font-size: 12px;
+}

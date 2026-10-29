@@ -11,9 +11,12 @@
     "test:e2e": "playwright test",
     "db:types": "node scripts/generate-types.mjs",
     "lint": "eslint src tests scripts next.config.ts",
-    "format": "prettier --write src tests scripts docs *.ts *.mjs *.json README.md"
+    "format": "prettier --write src tests scripts docs *.ts *.mjs *.json README.md",
+    "audit:responsive": "node scripts/audit-responsive.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
     "@fontsource-variable/manrope": "^5.3.0",
     "@fontsource/cormorant-garamond": "^5.3.0",
     "@sentry/nextjs": "^11.8.0",
@@ -44,6 +47,6 @@
     "lighthouse": "^13.5.0",
     "prettier": "^3.9.10",
     "typescript": "^5.9.0",
-    "vitest": "^3.2.0"
+    "vitest": "^4.1.12"
   }
 }

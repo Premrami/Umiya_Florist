@@ -1,0 +1,52 @@
+[
+  {
+    "path": "/",
+    "status": 200,
+    "cache": "private, no-cache, no-store, max-age=0, must-revalidate"
+  },
+  {
+    "path": "/privacy",
+    "status": 200,
+    "cache": "s-maxage=31536000"
+  },
+  {
+    "path": "/login",
+    "status": 200,
+    "robots": "noindex, nofollow",
+    "cache": "private, no-store"
+  },
+  {
+    "path": "/login/recover",
+    "status": 200,
+    "robots": "noindex, nofollow",
+    "cache": "private, no-store"
+  },
+  {
+    "path": "/admin/clients",
+    "status": 200,
+    "robots": "noindex, nofollow",
+    "cache": "private, no-store"
+  },
+  {
+    "path": "/api/admin/clients",
+    "status": 401,
+    "robots": "noindex, nofollow",
+    "cache": "private, no-store"
+  },
+  {
+    "path": "/api/cron/inquiry-alerts",
+    "status": 401,
+    "robots": "noindex, nofollow",
+    "cache": "private, no-store"
+  },
+  {
+    "path": "/api/invoice/invalid",
+    "status": 404,
+    "robots": "noindex, nofollow",
+    "cache": "private, no-store"
+  },
+  {
+    "path": "POST inquiry without origin",
+    "status": 403
+  }
+]

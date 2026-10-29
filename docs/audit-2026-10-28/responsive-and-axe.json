@@ -1,0 +1,189 @@
+[
+  {
+    "width": 320,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 9.59375,
+      "right": 310.390625
+    },
+    "modalAxe": [],
+    "errors": []
+  },
+  {
+    "width": 375,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 11.25,
+      "right": 363.75
+    },
+    "modalAxe": [],
+    "errors": []
+  },
+  {
+    "width": 390,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 11.703125,
+      "right": 378.296875
+    },
+    "modalAxe": [],
+    "errors": []
+  },
+  {
+    "width": 430,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 12.90625,
+      "right": 417.09375
+    },
+    "modalAxe": [],
+    "errors": []
+  },
+  {
+    "width": 459,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 13.765625,
+      "right": 445.21875
+    },
+    "modalAxe": [],
+    "errors": []
+  },
+  {
+    "width": 460,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 13.796875,
+      "right": 446.1875
+    },
+    "modalAxe": [],
+    "errors": []
+  },
+  {
+    "width": 768,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 38.40625,
+      "right": 729.59375
+    },
+    "modalAxe": [],
+    "errors": []
+  },
+  {
+    "width": 1024,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 142,
+      "right": 882
+    },
+    "modalAxe": [],
+    "errors": []
+  },
+  {
+    "width": 1280,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 270,
+      "right": 1010
+    },
+    "modalAxe": [],
+    "errors": []
+  },
+  {
+    "width": 1440,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 350,
+      "right": 1090
+    },
+    "modalAxe": [],
+    "errors": []
+  },
+  {
+    "width": 1920,
+    "http": 200,
+    "status": "complete",
+    "h1": 1,
+    "overflow": false,
+    "sections": [],
+    "duplicateIds": [],
+    "violations": [],
+    "dialog": {
+      "overflow": false,
+      "left": 590,
+      "right": 1330
+    },
+    "modalAxe": [],
+    "errors": []
+  }
+]

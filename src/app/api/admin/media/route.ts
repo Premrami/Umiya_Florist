@@ -1,6 +1,11 @@
+import { GET as listRecords } from '../[module]/route';
 import { sameOrigin } from '@/lib/origin';
 import { authorize, apiError } from '@/lib/auth';
 import { randomUUID } from 'node:crypto';
+export async function GET(req: Request) {
+  return listRecords(req, { params: Promise.resolve({ module: 'media' }) });
+}
+
 export async function POST(req: Request) {
   try {
     if (!sameOrigin(req)) throw new Error('FORBIDDEN');

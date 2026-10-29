@@ -1,0 +1,24 @@
+[
+  {
+    "width": 390,
+    "lcp": 3952,
+    "cls": 0.007834649315447927,
+    "seed": true,
+    "flower": true,
+    "bud": true,
+    "opened": true,
+    "openedAt": 13790.30000000028,
+    "errors": []
+  },
+  {
+    "width": 1440,
+    "lcp": 548,
+    "cls": 0.0035701573417674043,
+    "seed": true,
+    "flower": true,
+    "bud": true,
+    "opened": true,
+    "openedAt": 10397.299999999814,
+    "errors": []
+  }
+]

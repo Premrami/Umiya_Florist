@@ -22,7 +22,13 @@ const config: NextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
-      { source: '/admin/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+      ...['/admin/:path*', '/login/:path*', '/auth/:path*', '/api/:path*'].map((source) => ({
+        source,
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+          { key: 'Cache-Control', value: 'private, no-store' },
+        ],
+      })),
     ];
   },
 };

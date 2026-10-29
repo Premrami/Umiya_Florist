@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { phoneSchema, optionalPhoneSchema } from './phone-validation';
 const text = z.string().trim().min(1).max(500),
   notes = z.string().max(5000).optional(),
   id = z.string().uuid(),
@@ -19,6 +20,7 @@ const image = z
       return false;
     }
   }, 'Use an approved HTTPS media URL');
+const httpsUrl = z.url().refine((value) => /^https:\/\//i.test(value), 'Use a secure HTTPS URL');
 const publication = z.enum(['draft', 'published', 'archived']);
 export type Field = {
   key: string;
@@ -26,6 +28,9 @@ export type Field = {
   type?: string;
   options?: string[];
   required?: boolean;
+  min?: number;
+  max?: number;
+  step?: number | 'any';
 };
 export type ModuleSpec = {
   table: string;
@@ -50,7 +55,7 @@ export const specs: Record<string, ModuleSpec> = {
     permission: 'crm',
     schema: z.object({
       name: text,
-      phone: z.string().regex(/^\+?[0-9]{10,15}$/),
+      phone: phoneSchema,
       email: z.union([z.email(), z.literal('')]).optional(),
       whatsapp: notes,
       customer_type: text,
@@ -62,7 +67,7 @@ export const specs: Record<string, ModuleSpec> = {
     }),
     fields: [
       f('name', 'Full name'),
-      f('phone', 'Phone (digits, country code)'),
+      f('phone', 'Phone (digits, country code)', 'tel'),
       f('email', 'Email', 'email', false),
       f('customer_type', 'Customer type', 'select', true, [
         'Regular Pooja Customer',
@@ -220,7 +225,7 @@ export const specs: Record<string, ModuleSpec> = {
       category: text,
       description: notes,
       image_url: image,
-      price: z.union([money, z.literal('')]).transform((v) => (v === '' ? null : v)),
+      price: z.union([z.literal(''), money]).transform((v) => (v === '' ? null : v)),
       status: publication,
       sort_order: z.coerce.number().int().min(0).default(0),
     }),
@@ -258,7 +263,7 @@ export const specs: Record<string, ModuleSpec> = {
         'Consumables',
       ]),
       f('unit', 'Unit', 'select', true, ['stems', 'bunches', 'kg', 'packets', 'pieces']),
-      f('reorder_threshold', 'Reorder level', 'number'),
+      { ...f('reorder_threshold', 'Reorder level', 'number'), step: 'any' },
       f('unit_cost', 'Unit cost (paise)', 'number'),
       f('status', 'Status', 'select', true, ['active', 'archived']),
     ],
@@ -400,6 +405,18 @@ export const specs: Record<string, ModuleSpec> = {
           payment_instructions: z.string().max(1000),
           retention_days: z.coerce.number().int().min(30).max(3650),
           default_delivery_charge: money,
+          inquiry_alert_phone: z
+            .string()
+            .regex(/^$|^\+[1-9]\d{7,14}$/)
+            .default(''),
+          inquiry_whatsapp_enabled: z
+            .union([z.boolean(), z.literal('true')])
+            .transform((v) => v === true || v === 'true')
+            .default(false),
+          inquiry_sms_enabled: z
+            .union([z.boolean(), z.literal('true')])
+            .transform((v) => v === true || v === 'true')
+            .default(false),
         })
         .refine((v) => !v.tax_bps || v.gstin.length === 15, 'Tax requires a verified GSTIN'),
       public: z.object({
@@ -407,25 +424,37 @@ export const specs: Record<string, ModuleSpec> = {
         email: z.union([z.email(), z.literal('')]).optional(),
         logo_url: z.union([image, z.literal('')]).optional(),
         service_areas: z.string().max(500).optional(),
-        map_url: z.union([z.url(), z.literal('')]).optional(),
-        google_business: z.union([z.url(), z.literal('')]).optional(),
-        phone: z.string().max(20),
-        whatsapp: z.string().max(20),
+        map_url: z.union([httpsUrl, z.literal('')]).optional(),
+        google_business: z.union([httpsUrl, z.literal('')]).optional(),
+        phone: optionalPhoneSchema,
+        whatsapp: optionalPhoneSchema,
         address: z.string().max(500),
         hours: z.string().max(300),
-        instagram: z.union([z.url(), z.literal('')]),
+        instagram: z.union([httpsUrl, z.literal('')]),
       }),
     }),
     fields: [
       f('private.invoice_prefix', 'Invoice prefix'),
       f('private.quotation_prefix', 'Quotation prefix'),
-      f('private.due_days', 'Default due days', 'number'),
+      { ...f('private.due_days', 'Default due days', 'number'), max: 365 },
       f('private.gstin', 'GSTIN (only if registered)', 'text', false),
-      f('private.tax_bps', 'Tax basis points (1800 = 18%, 0 = none)', 'number'),
+      { ...f('private.tax_bps', 'Tax basis points (1800 = 18%, 0 = none)', 'number'), max: 2800 },
       f('private.invoice_footer', 'Invoice footer', 'textarea', false),
       f('private.payment_instructions', 'Payment instructions', 'textarea', false),
-      f('private.retention_days', 'Retention preference (days)', 'number'),
+      {
+        ...f('private.retention_days', 'Retention preference (days)', 'number'),
+        min: 30,
+        max: 3650,
+      },
       f('private.default_delivery_charge', 'Default delivery charge (paise)', 'number'),
+      f('private.inquiry_alert_phone', 'Admin inquiry alert phone (+country code)', 'tel', false),
+      f(
+        'private.inquiry_whatsapp_enabled',
+        'Enable WhatsApp inquiry alerts to admin',
+        'checkbox',
+        false,
+      ),
+      f('private.inquiry_sms_enabled', 'Enable SMS inquiry alerts to admin', 'checkbox', false),
       f('public.name', 'Business name'),
       f('public.email', 'Business email', 'email', false),
       f('public.logo_url', 'Logo image URL', 'url', false),

@@ -1,0 +1,74 @@
+[
+  {
+    "width": 390,
+    "module": "clients",
+    "pageAxe": [],
+    "dialogAxe": []
+  },
+  {
+    "width": 390,
+    "module": "clients",
+    "overflow": false,
+    "offscreen": false
+  },
+  {
+    "width": 390,
+    "module": "inventory",
+    "pageAxe": [],
+    "dialogAxe": []
+  },
+  {
+    "width": 390,
+    "module": "inventory",
+    "overflow": false,
+    "offscreen": false
+  },
+  {
+    "width": 390,
+    "module": "settings",
+    "pageAxe": [],
+    "dialogAxe": []
+  },
+  {
+    "width": 390,
+    "module": "settings",
+    "overflow": false,
+    "offscreen": false
+  },
+  {
+    "width": 1440,
+    "module": "clients",
+    "pageAxe": [],
+    "dialogAxe": []
+  },
+  {
+    "width": 1440,
+    "module": "clients",
+    "overflow": false,
+    "offscreen": false
+  },
+  {
+    "width": 1440,
+    "module": "inventory",
+    "pageAxe": [],
+    "dialogAxe": []
+  },
+  {
+    "width": 1440,
+    "module": "inventory",
+    "overflow": false,
+    "offscreen": false
+  },
+  {
+    "width": 1440,
+    "module": "settings",
+    "pageAxe": [],
+    "dialogAxe": []
+  },
+  {
+    "width": 1440,
+    "module": "settings",
+    "overflow": false,
+    "offscreen": false
+  }
+]

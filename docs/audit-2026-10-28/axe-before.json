@@ -1,0 +1,45 @@
+[
+  {
+    "path": "/?intro=0",
+    "title": "Umiya Florist | Flowers for beautiful moments",
+    "h1": 1,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".image-stamp > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.5 (foreground color: #931b32, background color: #650d1b, font size: 16.5pt (22px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".contact-details > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.5 (foreground color: #e0c5ac, background color: #faf4ec, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/privacy",
+    "title": "Privacy | Umiya Florist",
+    "h1": 1,
+    "violations": []
+  },
+  {
+    "path": "/login",
+    "title": "Studio access | Umiya Florist",
+    "h1": 1,
+    "violations": []
+  },
+  {
+    "path": "/login/recover",
+    "title": "Set your password | Umiya Studio",
+    "h1": 1,
+    "violations": []
+  }
+]

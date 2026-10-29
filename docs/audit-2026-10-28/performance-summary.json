@@ -1,0 +1,53 @@
+{
+  "beforeMobile": {
+    "url": "http://127.0.0.1:3100/",
+    "scores": {
+      "performance": 74,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "metrics": {
+      "first-contentful-paint": 1817.0067,
+      "largest-contentful-paint": 9911.337800000001,
+      "total-blocking-time": 32,
+      "cumulative-layout-shift": 0.00807689120665744
+    },
+    "lighthouseVersion": "13.5.0",
+    "fetchTime": "2026-10-28T11:43:16.631Z"
+  },
+  "afterMobile": {
+    "url": "http://127.0.0.1:3100/",
+    "scores": {
+      "performance": 85,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 63
+    },
+    "metrics": {
+      "first-contentful-paint": 910.8109999999999,
+      "largest-contentful-paint": 4381.621999999999,
+      "total-blocking-time": 17.5,
+      "cumulative-layout-shift": 0
+    },
+    "lighthouseVersion": "13.5.0",
+    "fetchTime": "2026-10-28T12:14:22.305Z"
+  },
+  "afterDesktop": {
+    "url": "http://127.0.0.1:3100/",
+    "scores": {
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 63
+    },
+    "metrics": {
+      "first-contentful-paint": 245.56849999999997,
+      "largest-contentful-paint": 709.35275,
+      "total-blocking-time": 0,
+      "cumulative-layout-shift": 0
+    },
+    "lighthouseVersion": "13.5.0",
+    "fetchTime": "2026-10-28T12:08:34.859Z"
+  }
+}

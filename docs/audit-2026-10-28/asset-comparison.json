@@ -1,0 +1,12 @@
+{
+  "originalBytes": 1712568,
+  "optimizedBytes": 105072,
+  "reductionPercent": 93.86465238168645,
+  "verification": {
+    "comparison": "Browser rendering on wine background at 1430 × 370; original SVG vs precomputed-alpha WebP",
+    "maxChannelDifference": 2,
+    "meanChannelDifference": 0.003936243936243936,
+    "channelRange": "0–255",
+    "note": "Rounding differences affect transparent antialias edges. Original source preserved."
+  }
+}

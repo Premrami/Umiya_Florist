@@ -76,6 +76,8 @@ const schema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('monthly'), month: z.iso.date() }),
   z.object({ action: z.literal('finalize'), id: uuid }),
   z.object({ action: z.literal('publish'), id: uuid }),
+  z.object({ action: z.literal('delete_section'), id: uuid }),
+  z.object({ action: z.literal('delete_inquiry'), id: uuid }),
   z.object({ action: z.literal('convert'), id: uuid }),
   z.object({ action: z.literal('pause'), id: uuid, start: z.iso.date(), end: z.iso.date() }),
   z.object({
@@ -143,9 +145,9 @@ export async function POST(req: Request) {
       'price',
     ].includes(p.action)
       ? 'operations'
-      : p.action === 'publish'
+      : ['publish', 'delete_section'].includes(p.action)
         ? 'content'
-        : ['convert', 'consent', 'address', 'followup'].includes(p.action)
+        : ['convert', 'consent', 'address', 'followup', 'delete_inquiry'].includes(p.action)
           ? 'crm'
           : 'finance';
     const { db } = await authorize(permission);
@@ -233,6 +235,25 @@ export async function POST(req: Request) {
       ({ data: result, error } = await db.rpc('finalize_invoice', { p_id: p.id }));
     if (p.action === 'publish')
       ({ data: result, error } = await db.rpc('publish_section', { p_id: p.id }));
+    if (p.action === 'delete_section')
+      ({ data: result, error } = await db.rpc('delete_site_section', { p_id: p.id }));
+    if (p.action === 'delete_inquiry') {
+      // Table RLS prohibits direct browser deletes. Elevate only this fixed-table,
+      // UUID-scoped operation after the staff CRM authorization above.
+      const { data, error: deletionError } = await service()
+        .from('inquiries')
+        .delete()
+        .eq('id', p.id)
+        .select('id')
+        .single();
+      if (deletionError?.code === 'PGRST116')
+        return Response.json(
+          { error: 'This inquiry no longer exists. Refresh the list.' },
+          { status: 404 },
+        );
+      if (deletionError) throw deletionError;
+      result = data;
+    }
     if (p.action === 'convert')
       ({ data: result, error } = await db.rpc('convert_inquiry', { p_id: p.id }));
     if (p.action === 'pause')

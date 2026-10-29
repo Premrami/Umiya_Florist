@@ -18,7 +18,7 @@ Official contracts consulted: https://razorpay.com/docs/api/payments/payment-lin
 
 ## WhatsApp
 
-Only supported click-to-chat is used. The owner reviews and opens an individual message. Files are downloaded for manual attachment. Logs distinguish prepared, opened, manually sent and failed. No bulk send, automatic attachment, delivered or read claim exists. Invoice access uses a random 256-bit token; only its SHA-256 hash is stored, expiring after seven days and revocable.
+Invoice sharing uses supported click-to-chat. New-inquiry admin WhatsApp and SMS alerts use the server-side Twilio integration described in [the alert setup guide](inquiry-alerts.md); these channels stay off until configured. The owner reviews and opens an individual message. Files are downloaded for manual attachment. Logs distinguish prepared, opened, manually sent and failed. No bulk send, automatic attachment, delivered or read claim exists. Invoice access uses a random 256-bit token; only its SHA-256 hash is stored, expiring after seven days and revocable.
 
 ## Resend
 

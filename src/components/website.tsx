@@ -1,13 +1,18 @@
 'use client';
 import Image from 'next/image';
+import { FormInput } from './form-input';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { MobileDock } from './mobile-dock';
+import { useContext, useEffect, useId, useRef, useState } from 'react';
 import {
+  House,
+  Info,
+  Sprout,
   ArrowUpRight,
   ArrowDown,
+  Flower2,
   Menu,
   X,
-  Flower2,
   MoveRight,
   Plus,
   ChevronLeft,
@@ -15,6 +20,8 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { EntranceReadyContext } from './entrance-context';
 import { photos, type PublicContent, type CatalogItem } from '@/lib/public-content';
 import { inr } from '@/lib/business';
 const nav = [
@@ -29,37 +36,51 @@ const nav = [
 ];
 function Botanical() {
   return (
-    <svg className="botanical" viewBox="0 0 110 100" aria-hidden="true">
-      <path className="stem" d="M15 98 Q53 77 60 28 M39 78 Q18 55 21 40 M51 58 Q83 60 91 40" />
-      <ellipse className="leaf" cx="25" cy="48" rx="8" ry="17" transform="rotate(-35 25 48)" />
-      <ellipse className="leaf" cx="81" cy="49" rx="8" ry="18" transform="rotate(48 81 49)" />
-      {[0, 60, 120, 180, 240, 300].map((r) => (
-        <ellipse
-          className="petal"
-          key={r}
-          cx="60"
-          cy="16"
-          rx="7"
-          ry="14"
-          transform={`rotate(${r} 60 28)`}
-        />
-      ))}
-      <circle cx="60" cy="28" r="5" />
+    <svg className="botanical" viewBox="0 0 80 90" aria-hidden="true" focusable="false">
+      <path className="stem" pathLength="1" d="M72 88 C49 76 39 55 40 28" />
+      <g transform="translate(48 66) rotate(-48)">
+        <path className="leaf" d="M0 0 C-14 0 -20 -10 -19 -16 C-7 -17 0 -9 0 0Z" />
+      </g>
+      <g transform="translate(41 51) rotate(18)">
+        <path className="leaf" d="M0 0 C13 0 21 -10 20 -16 C8 -16 1 -8 0 0Z" />
+      </g>
+      <g transform="translate(40 28)">
+        <g className="blossom">
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+            <g key={angle} transform={`rotate(${angle})`}>
+              <path
+                className="petal"
+                d="M0 1 C-5 -3 -8 -12 -6 -18 C-4 -24 4 -24 6 -18 C8 -12 5 -3 0 1Z"
+              />
+            </g>
+          ))}
+          <circle className="flower-center" r="5" />
+        </g>
+      </g>
     </svg>
   );
 }
-function Brand({ name, logo }: { name?: string; logo?: string }) {
+function Brand({
+  name = 'Umiya Florist',
+  logo,
+  priority = false,
+}: {
+  name?: string;
+  logo?: string;
+  priority?: boolean;
+}) {
   return (
-    <a className="wordmark" href="#home">
-      {logo ? (
-        <Image src={logo} width={38} height={38} alt="Studio logo" />
-      ) : (
-        <Flower2 size={32} strokeWidth={1} />
-      )}
-      <span>
-        {name && name !== 'Umiya Florist' ? name : 'UMIYA'}
-        <small>F L O R I S T</small>
-      </span>
+    <a className="wordmark" href="#home" aria-label={`${name} — Home`}>
+      <Image
+        className="brand-logo"
+        unoptimized
+        src={logo || '/images/umiya-florist-logo.webp'}
+        width={1430}
+        height={370}
+        alt={`${name} — Flowers for every occasion`}
+        loading={priority ? 'eager' : 'lazy'}
+        sizes="(max-width: 459px) 190px, (max-width: 1050px) 240px, 280px"
+      />
     </a>
   );
 }
@@ -76,7 +97,15 @@ function Modal({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    ref.current?.showModal();
+    const dialog = ref.current;
+    const priorOverflow = document.body.style.overflow;
+    const priorFocus = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = 'hidden';
+    dialog?.showModal();
+    return () => {
+      document.body.style.overflow = priorOverflow;
+      if (priorFocus?.isConnected) priorFocus.focus({ preventScroll: true });
+    };
   }, []);
   return (
     <dialog ref={ref} className={className} aria-label={title} onClose={onClose}>
@@ -92,6 +121,22 @@ function Modal({
   );
 }
 export function Website({ content: c }: { content: PublicContent }) {
+  const entranceReady = useContext(EntranceReadyContext);
+  const [activeSection, setActiveSection] = useState('home');
+  useEffect(() => {
+    if (!entranceReady) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setActiveSection(visible[0].target.id);
+      },
+      { rootMargin: '-15% 0px -55% 0px' },
+    );
+    document.querySelectorAll('main > section[id]').forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [entranceReady]);
   const root = useRef<HTMLDivElement>(null),
     [menu, setMenu] = useState(false),
     [filter, setFilter] = useState('All flowers'),
@@ -104,33 +149,215 @@ export function Website({ content: c }: { content: PublicContent }) {
     pooja = c.sections.pooja ?? {},
     contact = c.sections.contact ?? {};
   useEffect(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const ctx = gsap.context(() => {
-      gsap.from('.hero .reveal', {
-        y: 35,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.12,
-        ease: 'power3.out',
-      });
-      gsap.from('.hero-image', {
-        scale: 1.025,
-        y: 15,
-        duration: 1.3,
-        ease: 'power3.inOut',
-      });
-      gsap.registerPlugin(ScrollTrigger);
-      gsap.utils.toArray<HTMLElement>('.section-top,.about-copy,.pooja-copy').forEach((el) =>
-        gsap.from(el, {
-          y: 24,
+    if (!entranceReady) return;
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+    const media = gsap.matchMedia();
+    media.add('(prefers-reduced-motion: no-preference)', () => {
+      const ctx = gsap.context(() => {
+        gsap.from('.hero .reveal', {
+          y: 22,
           opacity: 0,
-          duration: 0.8,
-          scrollTrigger: { trigger: el, start: 'top 92%', once: true },
-        }),
-      );
-    }, root);
-    return () => ctx.revert();
-  }, []);
+          duration: 1.15,
+          stagger: 0.1,
+          ease: 'power2.out',
+          clearProps: 'transform,opacity',
+        });
+        gsap.from('.hero-image', {
+          scale: 1.035,
+          duration: 1.8,
+          ease: 'sine.out',
+          clearProps: 'transform',
+        });
+        const belowFold = (element: HTMLElement) =>
+          element.getBoundingClientRect().top >= window.innerHeight * 0.9;
+        // Reveal related copy together so headings, descriptions, and actions read as one sequence.
+        gsap.utils
+          .toArray<HTMLElement>(
+            '.section-top,.about-copy,.pooja-copy,.contact > div,.event-feature-copy,.testimonials,.social,.why,.faq-section',
+          )
+          .forEach((group) => {
+            if (!belowFold(group)) return;
+            const copy = group.querySelectorAll<HTMLElement>(
+              ':scope > .eyebrow,:scope > h2,:scope > h3,:scope > p,:scope > blockquote,:scope > .text-link,:scope > .signature,:scope > .button,:scope > .quiet,:scope > div > .eyebrow,:scope > div > h2',
+            );
+            if (!copy.length) return;
+            gsap.from(copy, {
+              y: 24,
+              opacity: 0,
+              duration: 1,
+              stagger: 0.09,
+              ease: 'power2.out',
+              clearProps: 'transform,opacity',
+              scrollTrigger: { trigger: group, start: 'top 90%', once: true },
+            });
+          });
+        gsap.utils
+          .toArray<HTMLElement>('.flower-grid,.portfolio-grid,.why > div:last-child')
+          .forEach((grid) => {
+            if (!belowFold(grid) || !grid.children.length) return;
+            gsap.from(Array.from(grid.children), {
+              y: 32,
+              opacity: 0,
+              duration: 1.05,
+              stagger: Math.min(0.11, 0.44 / grid.children.length),
+              ease: 'power2.out',
+              clearProps: 'transform,opacity',
+              scrollTrigger: { trigger: grid, start: 'top 93%', once: true },
+            });
+          });
+        gsap.utils
+          .toArray<HTMLElement>(
+            '.filter-row,.event-tabs,.work-note,.inquiry-form,.faq-section details,.contact-details',
+          )
+          .forEach((element) => {
+            if (!belowFold(element)) return;
+            gsap.from(element, {
+              y: 18,
+              opacity: 0,
+              duration: 0.9,
+              ease: 'power2.out',
+              clearProps: 'transform,opacity',
+              scrollTrigger: { trigger: element, start: 'top 95%', once: true },
+            });
+          });
+        gsap.utils.toArray<HTMLElement>('.section-image-viewport').forEach((frame) => {
+          if (!belowFold(frame)) return;
+          gsap.fromTo(
+            frame,
+            { clipPath: 'inset(12% 0% 12% 0%)' },
+            {
+              clipPath: 'inset(0% 0% 0% 0%)',
+              duration: 1.4,
+              ease: 'power2.inOut',
+              clearProps: 'clipPath',
+              scrollTrigger: { trigger: frame, start: 'top 93%', once: true },
+            },
+          );
+        });
+        gsap.to('.reading-progress span', {
+          scaleX: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: root.current,
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: 0.3,
+          },
+        });
+      }, root);
+      let scroll: gsap.core.Tween | undefined;
+      const priorScrollBehavior = document.documentElement.style.scrollBehavior;
+      const restoreScrollBehavior = () => {
+        document.documentElement.style.scrollBehavior = priorScrollBehavior;
+      };
+      const interrupt = () => {
+        scroll?.kill();
+        restoreScrollBehavior();
+      };
+      const keyInterrupt = (event: KeyboardEvent) => {
+        if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key))
+          interrupt();
+      };
+      const navigate = (event: MouseEvent) => {
+        if (
+          event.defaultPrevented ||
+          event.button !== 0 ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        )
+          return;
+        const link = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
+        if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+        const hash = link.getAttribute('href')!;
+        const target = document.getElementById(hash.slice(1));
+        if (!target || hash === '#main') return;
+        event.preventDefault();
+        interrupt();
+        const header = root.current?.querySelector('.site-header');
+        const offset = (header?.getBoundingClientRect().height ?? 80) + 12;
+        const distance = Math.abs(target.getBoundingClientRect().top - offset);
+        // Native CSS smooth scrolling must yield to the animation's frame updates.
+        document.documentElement.style.scrollBehavior = 'auto';
+        scroll = gsap.to(window, {
+          scrollTo: { y: target, offsetY: offset, autoKill: true },
+          duration: Math.min(1.65, Math.max(0.65, distance / 2400)),
+          ease: 'power2.inOut',
+          onInterrupt: restoreScrollBehavior,
+          onComplete: () => {
+            restoreScrollBehavior();
+            if (window.location.hash !== hash) history.pushState(null, '', hash);
+            const hadTabIndex = target.hasAttribute('tabindex');
+            if (!hadTabIndex) target.setAttribute('tabindex', '-1');
+            target.focus({ preventScroll: true });
+            if (!hadTabIndex) {
+              target.addEventListener('blur', () => target.removeAttribute('tabindex'), {
+                once: true,
+              });
+            }
+          },
+        });
+      };
+      const site = root.current;
+      site?.addEventListener('click', navigate);
+      window.addEventListener('wheel', interrupt, { passive: true });
+      window.addEventListener('touchstart', interrupt, { passive: true });
+      window.addEventListener('keydown', keyInterrupt);
+      return () => {
+        interrupt();
+        site?.removeEventListener('click', navigate);
+        window.removeEventListener('wheel', interrupt);
+        window.removeEventListener('touchstart', interrupt);
+        window.removeEventListener('keydown', keyInterrupt);
+        ctx.revert();
+      };
+    });
+    // Keep scroll-linked photography movement to pointer-driven desktop layouts.
+    media.add(
+      '(min-width: 900px) and (pointer: fine) and (prefers-reduced-motion: no-preference)',
+      () => {
+        const ctx = gsap.context(() => {
+          gsap.utils.toArray<HTMLElement>('.section-image-viewport').forEach((frame) => {
+            const image = frame.querySelector('img');
+            if (!image) return;
+            gsap.fromTo(
+              image,
+              { scale: 1.09, yPercent: -3 },
+              {
+                scale: 1.09,
+                yPercent: 3,
+                ease: 'none',
+                scrollTrigger: {
+                  trigger: frame,
+                  start: 'top bottom',
+                  end: 'bottom top',
+                  scrub: 0.8,
+                  invalidateOnRefresh: true,
+                },
+              },
+            );
+          });
+          gsap.fromTo(
+            '.image-stamp',
+            { rotation: -12 },
+            {
+              rotation: -4,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: '.about-image',
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1,
+              },
+            },
+          );
+        }, root);
+        return () => ctx.revert();
+      },
+    );
+    return () => media.revert();
+  }, [entranceReady]);
   const open = (type: string) => {
     setItem(null);
     setInquiry(type);
@@ -154,21 +381,35 @@ export function Website({ content: c }: { content: PublicContent }) {
         Skip to content
       </a>
       <header className="site-header">
-        <Brand name={c.settings.name} logo={c.settings.logo_url} />
+        <div className="reading-progress" aria-hidden="true">
+          <span />
+        </div>
+        <Brand name={c.settings.name} logo={c.settings.logo_url} priority />
         <nav aria-label="Main navigation">
           {nav.map(([n, id]) => (
-            <a key={id} href={'#' + id}>
+            <a
+              key={id}
+              href={'#' + id}
+              aria-current={activeSection === id ? 'location' : undefined}
+            >
               {n}
             </a>
           ))}
         </nav>
-        <a className="header-contact" href="#contact">
-          Let’s talk flowers <ArrowUpRight size={17} />
+        <a
+          className="header-contact"
+          href="#contact"
+          aria-current={activeSection === 'contact' ? 'location' : undefined}
+        >
+          <span className="contact-label-desktop">Let’s talk flowers</span>
+          <span className="contact-label-mobile">Contact</span>
+          <ArrowUpRight size={17} />
         </a>
         <button
           className="mobile-menu"
           aria-label="Open menu"
           aria-expanded={menu}
+          aria-haspopup="dialog"
           onClick={() => setMenu(true)}
         >
           <Menu />
@@ -176,13 +417,38 @@ export function Website({ content: c }: { content: PublicContent }) {
       </header>
       {menu && (
         <Modal title="Navigation" className="mobile-nav" onClose={() => setMenu(false)}>
-          {nav.map(([n, id]) => (
-            <a key={id} href={'#' + id} onClick={() => setMenu(false)}>
+          {nav.map(([n, id], index) => (
+            <a
+              key={id}
+              href={'#' + id}
+              className={index < 4 ? 'mobile-nav-primary' : undefined}
+              onClick={() => setMenu(false)}
+            >
               {n}
             </a>
           ))}
         </Modal>
       )}
+      <MobileDock
+        label="Mobile navigation"
+        items={[
+          ...nav.slice(0, 4).map(([label, id], index) => ({
+            id,
+            label,
+            icon: [House, Info, Flower2, Sprout][index],
+            href: '#' + id,
+            active: activeSection === id,
+          })),
+          {
+            id: 'more',
+            label: 'More',
+            icon: Menu,
+            onClick: () => setMenu(true),
+            expanded: menu,
+            active: menu || !nav.slice(0, 4).some(([, id]) => id === activeSection),
+          },
+        ]}
+      />
       <main id="main">
         <section id="home" className="hero">
           <div className="hero-copy">
@@ -225,7 +491,8 @@ export function Website({ content: c }: { content: PublicContent }) {
               src={hero.image_url || photos.hero}
               alt="An expressive bouquet of roses and seasonal flowers"
               fill
-              priority
+              loading="eager"
+              fetchPriority="high"
               sizes="(max-width:700px) 100vw, 60vw"
             />
             <div className="image-shade" />
@@ -256,12 +523,14 @@ export function Website({ content: c }: { content: PublicContent }) {
         </div>
         <section id="about" className="about section-pad">
           <div className="about-image">
-            <Image
-              fill
-              src={about.image_url || photos.bouquet}
-              alt="Seasonal flowers arranged with care"
-              sizes="(max-width:700px) 90vw, 40vw"
-            />
+            <div className="section-image-viewport">
+              <Image
+                fill
+                src={about.image_url || photos.bouquet}
+                alt="Seasonal flowers arranged with care"
+                sizes="(max-width:700px) 90vw, 40vw"
+              />
+            </div>
             <div className="image-stamp">
               GATHERED<em>with love</em>
               <Flower2 size={24} />
@@ -385,12 +654,14 @@ export function Website({ content: c }: { content: PublicContent }) {
             <small>Tell us your requirements. We’ll help you plan your supply.</small>
           </div>
           <div className="pooja-image">
-            <Image
-              fill
-              src={pooja.image_url || photos.petals}
-              alt="Fresh flowers for everyday rituals"
-              sizes="(max-width:700px) 100vw, 50vw"
-            />
+            <div className="section-image-viewport">
+              <Image
+                fill
+                src={pooja.image_url || photos.petals}
+                alt="Fresh flowers for everyday rituals"
+                sizes="(max-width:700px) 100vw, 50vw"
+              />
+            </div>
             <span>BEAUTY IN THE EVERYDAY</span>
           </div>
         </section>
@@ -436,12 +707,14 @@ export function Website({ content: c }: { content: PublicContent }) {
             ))}
           </div>
           <div className="event-feature">
-            <Image
-              fill
-              src={c.services.find((x) => x.name === service)?.image_url || photos.wedding}
-              alt="Editorial reference for floral event styling"
-              sizes="100vw"
-            />
+            <div className="section-image-viewport">
+              <Image
+                fill
+                src={c.services.find((x) => x.name === service)?.image_url || photos.wedding}
+                alt="Editorial reference for floral event styling"
+                sizes="100vw"
+              />
+            </div>
             <div className="event-overlay" />
             <div className="event-feature-copy">
               <span className="eyebrow">CELEBRATE BEAUTIFULLY</span>
@@ -483,7 +756,13 @@ export function Website({ content: c }: { content: PublicContent }) {
             <div className="portfolio-grid">
               {c.portfolio.map((w, i) => (
                 <button key={w.id} onClick={() => setGallery(i)}>
-                  <Image width={900} height={700} src={w.image_url} alt={w.name} />
+                  <Image
+                    width={900}
+                    height={700}
+                    src={w.image_url}
+                    alt=""
+                    sizes="(max-width: 700px) 100vw, 50vw"
+                  />
                   <h3>{w.name}</h3>
                 </button>
               ))}
@@ -528,6 +807,7 @@ export function Website({ content: c }: { content: PublicContent }) {
         </section>
         <section id="testimonials" className="testimonials section-pad">
           <div className="eyebrow">WORDS WE TREASURE</div>
+          {c.testimonials.length > 0 && <h2>Kind words from our customers.</h2>}
           {c.testimonials.length ? (
             c.testimonials.map((t) => (
               <blockquote key={t.id}>
@@ -623,11 +903,7 @@ export function Website({ content: c }: { content: PublicContent }) {
         </nav>
         <div className="footer-top">
           <Brand name={c.settings.name} logo={c.settings.logo_url} />
-          <p>{c.sections.footer?.description || 'Flowers for every beautiful reason.'}</p>
           <a href="#home">Back to top ↑</a>
-        </div>
-        <div className="footer-name">
-          UMIYA FLORIST<span>✳</span>
         </div>
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} Umiya Florist</span>
@@ -680,7 +956,7 @@ export function Website({ content: c }: { content: PublicContent }) {
               height={800}
               alt={c.portfolio[gallery].name}
             />
-            <h3>{c.portfolio[gallery].name}</h3>
+            <h2>{c.portfolio[gallery].name}</h2>
             <button
               aria-label="Previous photo"
               onClick={() => setGallery((gallery - 1 + c.portfolio.length) % c.portfolio.length)}
@@ -704,6 +980,8 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
     [status, setStatus] = useState(''),
     [summary, setSummary] = useState<Record<string, string>>({}),
     key = useRef('');
+  const submitting = useRef(false);
+  const statusId = useId();
   const custom = type === 'Custom Bouquet',
     pooja = type === 'Pooja Flower Subscription',
     event = !custom && !pooja && type !== 'General' && !type.startsWith('Bouquet:');
@@ -725,6 +1003,8 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
   );
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setBusy(true);
     setStatus('');
     const form = e.currentTarget,
@@ -742,7 +1022,15 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
         }),
       });
       const json = await r.json();
-      if (!r.ok) throw new Error(json.error);
+      if (!r.ok) {
+        const field = typeof json.field === 'string' ? form.elements.namedItem(json.field) : null;
+        if (field instanceof HTMLElement) {
+          field.setAttribute('aria-invalid', 'true');
+          field.setAttribute('aria-describedby', statusId);
+          field.focus();
+        }
+        throw new Error(json.error);
+      }
       setStatus('Thank you. Your inquiry has been received. We’ll be in touch.');
       form.reset();
       setSummary({});
@@ -750,15 +1038,26 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
     } catch (e) {
       setStatus(e instanceof Error ? e.message : 'Please try again.');
     } finally {
+      submitting.current = false;
       setBusy(false);
     }
   }
   return (
-    <form className="inquiry-form" method="post" action="/api/public/inquiries" onSubmit={submit}>
+    <form
+      aria-busy={busy}
+      onInput={(e) => {
+        (e.target as HTMLElement).removeAttribute('aria-invalid');
+        (e.target as HTMLElement).removeAttribute('aria-describedby');
+      }}
+      className="inquiry-form"
+      method="post"
+      action="/api/public/inquiries"
+      onSubmit={submit}
+    >
       <div className="form-grid">
         <label>
           Your name
-          <input
+          <FormInput
             name="name"
             required
             minLength={2}
@@ -769,11 +1068,13 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
         </label>
         <label>
           Phone number
-          <input
+          <FormInput
             name="phone"
             type="tel"
             required
-            pattern={String.raw`\+?[0-9 \(\)\-]{10,20}`}
+            pattern={String.raw`\+?[1-9][0-9]{9,14}`}
+            maxLength={16}
+            title="Use 10–15 digits with an optional +country code"
             autoComplete="tel"
             placeholder="+91"
           />
@@ -781,7 +1082,7 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
         {!compact && (
           <label>
             Email (optional)
-            <input name="email" type="email" autoComplete="email" />
+            <FormInput name="email" type="email" autoComplete="email" />
           </label>
         )}
         {custom && (
@@ -804,7 +1105,7 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
             {select('wrapping', 'Wrapping', ['Natural paper', 'Ivory wrap', 'Luxury wrap'])}
             <label>
               Message for the recipient
-              <input name="gift_message" maxLength={300} />
+              <FormInput name="gift_message" maxLength={300} />
             </label>
           </>
         )}
@@ -812,12 +1113,12 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
           <>
             <label>
               Delivery address / area
-              <input name="address" required maxLength={500} />
+              <FormInput name="address" required maxLength={500} />
             </label>
             {select('frequency', 'Delivery frequency', ['Daily', 'Weekdays', 'Weekly', 'Custom'])}
             <label>
               Flower requirements
-              <input name="flowers" required maxLength={500} />
+              <FormInput name="flowers" required maxLength={500} />
             </label>
           </>
         )}
@@ -825,7 +1126,7 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
           <>
             <label>
               Event type
-              <input
+              <FormInput
                 name="event_type"
                 required
                 defaultValue={type === 'Event Decoration' ? '' : type}
@@ -834,11 +1135,11 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
             </label>
             <label>
               Venue / location
-              <input name="venue" required maxLength={300} />
+              <FormInput name="venue" required maxLength={300} />
             </label>
             <label>
               Expected guests
-              <input name="guests" type="number" min={1} max={100000} />
+              <FormInput name="guests" type="number" min={1} max={100000} step={1} />
             </label>
             {select('preferred_contact', 'Preferred contact', ['Phone', 'WhatsApp', 'Email'])}
           </>
@@ -847,7 +1148,7 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
           <>
             <label>
               {event ? 'Event date' : 'Preferred date'}
-              <input
+              <FormInput
                 name="date"
                 type="date"
                 required={event}
@@ -858,7 +1159,7 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
             </label>
             <label>
               Approximate budget (₹)
-              <input name="budget" maxLength={100} />
+              <FormInput name="budget" type="number" min={0} max={1000000000000} step="0.01" />
             </label>
           </>
         )}
@@ -888,11 +1189,11 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
       <div className="honeypot" aria-hidden="true">
         <label>
           Leave blank
-          <input name="website" tabIndex={-1} autoComplete="off" />
+          <FormInput name="website" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
       <label className="consent">
-        <input type="checkbox" name="marketing_consent" /> Send me occasional floral updates and
+        <FormInput type="checkbox" name="marketing_consent" /> Send me occasional floral updates and
         offers. Optional.
       </label>
       <p className="privacy-note">
@@ -903,7 +1204,7 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
         <ArrowUpRight size={18} />
       </button>
       {status && (
-        <p className="form-status" role="status">
+        <p id={statusId} className="form-status" role="status">
           {status}
         </p>
       )}

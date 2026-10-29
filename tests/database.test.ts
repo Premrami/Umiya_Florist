@@ -31,6 +31,8 @@ beforeAll(async () => {
     '010_net_reporting.sql',
     '011_billing_settings.sql',
     '012_billing_identity.sql',
+    '013_delete_sections.sql',
+    '014_inquiry_notifications.sql',
   ])
     await db.exec(
       (await readFile('supabase/migrations/' + file, 'utf8')).replace(
@@ -80,6 +82,45 @@ describe.sequential('database workflows', () => {
     await role('authenticated', editor);
     expect((await db.query('select * from customers')).rows).toHaveLength(0);
     await expect(db.exec(`select generate_monthly('2026-09-01')`)).rejects.toThrow();
+  });
+  it('deletes section history and retains audit records while enforcing content access', async () => {
+    await role('authenticated', editor);
+    const section = String(
+      (
+        await one(
+          `insert into site_sections(key,draft) values('delete-test','{"headline":"Test"}') returning id`,
+        )
+      ).id,
+    );
+    await db.query('select publish_section($1)', [section]);
+    await role('anon');
+    await expect(db.query('select delete_site_section($1)', [section])).rejects.toThrow();
+    await db.exec('reset role');
+    await db.exec(`insert into auth.users(id) values('33333333-3333-4333-8333-333333333333');
+      insert into profiles(id,display_name,role) values('33333333-3333-4333-8333-333333333333','Manager','manager')`);
+    await role('authenticated', '33333333-3333-4333-8333-333333333333');
+    await expect(db.query('select delete_site_section($1)', [section])).rejects.toThrow(
+      'Permission denied',
+    );
+    await role('authenticated', editor);
+    expect(
+      (await db.query('select * from content_revisions where section_id=$1', [section])).rows,
+    ).toHaveLength(1);
+    await db.query('select delete_site_section($1)', [section]);
+    expect(
+      (await db.query('select * from site_sections where id=$1', [section])).rows,
+    ).toHaveLength(0);
+    expect(
+      (await db.query('select * from content_revisions where section_id=$1', [section])).rows,
+    ).toHaveLength(0);
+    await role('authenticated', owner);
+    expect(
+      (await db.query("select * from audit_logs where action='DELETE' and record_id=$1", [section]))
+        .rows.length,
+    ).toBeGreaterThan(0);
+    await expect(db.query('select delete_site_section($1)', [section])).rejects.toThrow(
+      'Section not found',
+    );
   });
   it('schedules once and respects pause ranges', async () => {
     await role('authenticated', owner);
@@ -321,5 +362,103 @@ describe.sequential('database workflows', () => {
     const rows = (await db.query('select * from billing_customers()')).rows;
     expect(rows.length).toBeGreaterThan(0);
     expect(rows[0]).not.toHaveProperty('notes');
+  });
+  it('queues each inquiry once per channel and prevents concurrent or uncertain duplicate sends', async () => {
+    await role('service_role');
+    const payload = {
+      name: 'Alert fixture',
+      phone: '+12025550123',
+      type: 'Pooja Flower Subscription',
+      message: 'Fresh jasmine daily',
+      frequency: 'Daily',
+      flowers: 'Jasmine',
+      address: 'Fixture address',
+      marketing_consent: false,
+      idempotency_key: '77777777-7777-4777-8777-777777777777',
+    };
+    const first = await one('select submit_inquiry($1::jsonb,$2) as id', [
+      JSON.stringify(payload),
+      'alert-fixture',
+    ]);
+    const repeated = await one('select submit_inquiry($1::jsonb,$2) as id', [
+      JSON.stringify(payload),
+      'alert-fixture',
+    ]);
+    expect(repeated.id).toBe(first.id);
+    expect(
+      (await db.query('select * from inquiry_notifications where inquiry_id=$1', [first.id])).rows,
+    ).toHaveLength(2);
+    await role('anon');
+    expect((await db.query('select * from inquiry_notifications')).rows).toHaveLength(0);
+    await expect(
+      db.query('select * from claim_inquiry_notifications($1)', [first.id]),
+    ).rejects.toThrow();
+    await role('authenticated', editor);
+    expect((await db.query('select * from inquiry_notifications')).rows).toHaveLength(0);
+    await expect(
+      db.query('select * from claim_inquiry_notifications($1)', [first.id]),
+    ).rejects.toThrow();
+    await role('authenticated', owner);
+    expect(
+      (await db.query('select * from inquiry_notifications where inquiry_id=$1', [first.id])).rows,
+    ).toHaveLength(2);
+    await role('service_role');
+    const jobs = (
+      await db.query<{ id: string; lease_token: string }>(
+        'select * from claim_inquiry_notifications($1)',
+        [first.id],
+      )
+    ).rows;
+    expect(jobs).toHaveLength(2);
+    expect(jobs[0].lease_token).toBeTruthy();
+    expect(
+      (await db.query('select * from claim_inquiry_notifications($1)', [first.id])).rows,
+    ).toHaveLength(0);
+    await db.query("update inquiry_notifications set status='provider_accepted' where id=$1", [
+      jobs[0].id,
+    ]);
+    await db.query(
+      "update inquiry_notifications set locked_at=now()-interval '6 minutes' where id=$1",
+      [jobs[1].id],
+    );
+    expect(
+      (await db.query('select * from claim_inquiry_notifications($1)', [first.id])).rows,
+    ).toHaveLength(0);
+    expect(
+      (await one('select status from inquiry_notifications where id=$1', [jobs[1].id])).status,
+    ).toBe('uncertain');
+    expect(
+      (await one('select status from inquiry_notifications where id=$1', [jobs[0].id])).status,
+    ).toBe('provider_accepted');
+  });
+});
+
+describe('inquiry deletion relations', () => {
+  it('removes alert jobs while preserving the linked client and audit history', async () => {
+    await role('authenticated', owner);
+    const q = await one<{ id: string }>(
+      "insert into inquiries(name,phone,type,message,idempotency_key,customer_id)values('Delete fixture','12025550123','General','Test',gen_random_uuid(),$1)returning id",
+      [customer],
+    );
+    await role('service_role');
+    expect(
+      (await db.query('select id from inquiry_notifications where inquiry_id=$1', [q.id])).rows,
+    ).toHaveLength(2);
+    await db.query('delete from inquiries where id=$1', [q.id]);
+    expect(
+      (await db.query('select id from inquiry_notifications where inquiry_id=$1', [q.id])).rows,
+    ).toHaveLength(0);
+    expect((await db.query('select id from customers where id=$1', [customer])).rows).toHaveLength(
+      1,
+    );
+    expect(
+      (
+        await db.query(
+          "select id from audit_logs where entity='inquiries' and record_id=$1 and action='DELETE'",
+          [q.id],
+        )
+      ).rows,
+    ).toHaveLength(1);
+    await role('authenticated', owner);
   });
 });

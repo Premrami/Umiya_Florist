@@ -3,6 +3,10 @@ import { redirect } from 'next/navigation';
 import { publicContent } from '@/lib/content';
 import { Website } from '@/components/website';
 export const dynamic = 'force-dynamic';
+export const metadata = {
+  title: 'Unpublished preview | Umiya Studio',
+  robots: { index: false, follow: false },
+};
 export default async function Preview() {
   let auth;
   try {

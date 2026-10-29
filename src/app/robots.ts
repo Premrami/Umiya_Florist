@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
+import { publicSiteOrigin } from '@/lib/seo';
 export default function robots(): MetadataRoute.Robots {
+  const origin = publicSiteOrigin();
   return {
-    rules: { userAgent: '*', allow: '/', disallow: ['/admin', '/login', '/api/'] },
-    ...(process.env.NEXT_PUBLIC_APP_URL
-      ? { sitemap: process.env.NEXT_PUBLIC_APP_URL + '/sitemap.xml' }
-      : {}),
+    rules: { userAgent: '*', allow: '/', disallow: ['/admin', '/login', '/auth/', '/api/'] },
+    ...(origin ? { sitemap: origin + '/sitemap.xml' } : {}),
   };
 }

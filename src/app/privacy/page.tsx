@@ -1,5 +1,10 @@
 import Link from 'next/link';
-export const metadata = { title: 'Privacy | Umiya Florist' };
+import { publicPageMetadata } from '@/lib/seo';
+export const metadata = publicPageMetadata(
+  'Privacy | Umiya Florist',
+  'How Umiya Florist uses inquiry details, promotional consent and business records, and how to request access, correction or deletion.',
+  '/privacy',
+);
 export default function Page() {
   return (
     <main className="error-page">
