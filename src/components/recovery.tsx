@@ -8,6 +8,9 @@ export function Recovery() {
     [busy, setBusy] = useState(false);
   return (
     <main className="login-page">
+      <Link href="/" className="wordmark login-brand" aria-label="Umiya Florist — Home">
+        <span className="login-brand-logo" aria-hidden="true" />
+      </Link>
       <div className="login-card">
         <span className="eyebrow">UMIYA STUDIO · SECURE ACCESS</span>
         <h1>A fresh start.</h1>

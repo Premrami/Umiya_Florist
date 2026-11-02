@@ -45,7 +45,7 @@ test('inquiry errors, retry, duplicate prevention and success without live submi
   await page
     .getByRole('button', { name: 'Something uniquely yours? Build a bouquet inquiry' })
     .click();
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', { name: 'Flower inquiry', exact: true });
   await dialog.getByLabel('Your name').fill('Audit test');
   await dialog.getByLabel('Phone number').fill('+91abc9876543210');
   await expect(dialog.getByLabel('Phone number')).toHaveValue('+919876543210');
@@ -57,6 +57,7 @@ test('inquiry errors, retry, duplicate prevention and success without live submi
   await expect(dialog.getByRole('checkbox')).not.toBeChecked();
   await dialog.getByRole('button', { name: 'Send your inquiry' }).click();
   await expect(dialog.getByRole('status')).toContainText('Please check your phone number.');
+  await expect(page.getByRole('dialog', { name: 'Inquiry sent', exact: true })).toHaveCount(0);
   await expect(dialog.getByLabel('Phone number')).toHaveAttribute('aria-invalid', 'true');
   await dialog.getByLabel('Phone number').fill('+919876543211');
   await expect(dialog.getByLabel('Phone number')).not.toHaveAttribute('aria-invalid', 'true');
@@ -64,7 +65,13 @@ test('inquiry errors, retry, duplicate prevention and success without live submi
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
   });
-  await expect(dialog.getByRole('status')).toContainText('received');
+  const confirmation = page.getByRole('dialog', { name: 'Inquiry sent', exact: true });
+  await expect(confirmation).toBeVisible();
+  await expect(confirmation.getByRole('status')).toContainText('received');
+  await expect(confirmation.getByRole('button', { name: 'Done', exact: true })).toBeFocused();
+  await confirmation.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(confirmation).toHaveCount(0);
+  await expect(dialog).toBeVisible();
   expect(requests).toBe(2);
   await expect(dialog.getByLabel('Your name')).toHaveValue('');
 });
@@ -157,4 +164,43 @@ test('full flower-to-logo sequence survives lazy loading', async ({ page }) => {
     bud: true,
     opened: true,
   });
+});
+
+test('contact inquiry shows a responsive confirmation and Escape returns focus', async ({
+  page,
+}) => {
+  let requests = 0;
+  await page.route('**/api/public/inquiries', async (route) => {
+    requests++;
+    await route.fulfill({ status: 201, json: { received: true } });
+  });
+  await page.goto('/?intro=0');
+  const form = page.locator('#contact .inquiry-form');
+  await form.getByLabel('Your name', { exact: true }).fill('Confirmation test');
+  await form.getByLabel('Phone number', { exact: true }).fill('+919876543210');
+  await form
+    .getByLabel('What can we create for you?', { exact: true })
+    .fill('Test only; do not send a real message.');
+  const submit = form.getByRole('button', { name: 'Send your inquiry', exact: true });
+  await submit.click();
+  const confirmation = page.getByRole('dialog', { name: 'Inquiry sent', exact: true });
+  await expect(confirmation).toBeVisible();
+  await expect(confirmation.getByRole('status')).toContainText('received');
+  expect(
+    await confirmation.evaluate((el) => {
+      const bounds = el.getBoundingClientRect();
+      return (
+        bounds.left >= 0 &&
+        bounds.right <= innerWidth &&
+        bounds.top >= 0 &&
+        bounds.bottom <= innerHeight &&
+        el.scrollWidth <= el.clientWidth
+      );
+    }),
+  ).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(confirmation).toHaveCount(0);
+  await expect(submit).toBeFocused();
+  await expect(form.getByLabel('Your name', { exact: true })).toHaveValue('');
+  expect(requests).toBe(1);
 });

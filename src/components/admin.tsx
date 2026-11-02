@@ -118,7 +118,7 @@ function value(key: string, v: any) {
 }
 export function Admin({ module, profile }: { module: string; profile: Row }) {
   const router = useRouter();
-  const sidebarRef = useRef<HTMLElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const [rows, setRows] = useState<Row[]>([]),
     [count, setCount] = useState(0),
     [page, setPage] = useState(0),
@@ -429,9 +429,9 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
   );
   return (
     <div className="admin-shell">
-      <aside
+      <div
         ref={sidebarRef}
-        role={mobile ? 'dialog' : undefined}
+        role={mobile ? 'dialog' : 'complementary'}
         aria-modal={mobile ? true : undefined}
         aria-label="Studio navigation"
         className={mobile ? 'admin-sidebar open' : 'admin-sidebar'}
@@ -487,7 +487,7 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
             <LogOut size={15} /> Sign out
           </button>
         </div>
-      </aside>
+      </div>
       {mobile && (
         <button
           className="admin-scrim"
@@ -638,7 +638,12 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
                   <div className="chart-legend">
                     <i /> Invoiced <i /> Collected
                   </div>
-                  <div className="chart-bars">
+                  <div
+                    className="chart-bars"
+                    tabIndex={0}
+                    role="region"
+                    aria-label="Monthly revenue and collections chart"
+                  >
                     {(overview.monthly_sales ?? []).map((m: Row) => {
                       const max = Math.max(
                         1,

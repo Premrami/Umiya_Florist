@@ -1,0 +1,696 @@
+/* Shared luxury styling only; Studio permissions and workflows stay unchanged. */
+.admin-shell {
+  --text: var(--lux-text);
+  --muted-admin: var(--lux-text);
+  background: var(--lux-pearl);
+  color: var(--lux-text);
+  font-family: var(--font-body);
+}
+.admin-shell :is(h1, h2, h3),
+.admin-dialog :is(h2, h3),
+.login-card h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--lux-black);
+}
+.admin-shell .admin-sidebar {
+  background: var(--lux-black);
+  border-color: #b88a7840;
+  padding-top: 32px;
+  color: var(--lux-pearl);
+}
+.admin-shell .admin-brand {
+  color: var(--lux-pearl);
+  padding: 0 4px 20px;
+}
+.admin-shell .admin-brand-logo {
+  width: 184px;
+}
+.admin-shell .sidebar-label {
+  margin-top: 18px;
+  color: var(--lux-dusty);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+}
+.admin-shell .admin-sidebar nav {
+  gap: 5px;
+  padding-bottom: 16px;
+}
+.admin-shell .admin-sidebar nav > a {
+  min-height: 44px;
+  padding: 11px 13px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--lux-nude);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.admin-shell .admin-sidebar nav > a svg {
+  flex-shrink: 0;
+}
+.admin-shell .admin-sidebar nav > a:is(:hover, :focus-visible) {
+  background: #b88a7829;
+  color: var(--lux-pearl);
+}
+.admin-shell .admin-sidebar nav > a.active {
+  color: var(--lux-black);
+  background: var(--lux-dusty);
+  border-color: var(--lux-rose);
+  font-weight: 600;
+}
+.admin-shell .sidebar-bottom {
+  border-color: #b88a7840;
+  color: var(--lux-nude);
+  gap: 8px;
+  padding-top: 12px;
+}
+.admin-shell .sidebar-bottom :is(a, button) {
+  min-height: 44px;
+  font-size: 10px;
+  color: var(--lux-nude);
+}
+.admin-shell .sidebar-close {
+  color: var(--lux-pearl);
+  border-radius: 8px;
+}
+.admin-shell .admin-header {
+  background: var(--lux-pearl);
+  border-color: var(--lux-border);
+  font-size: 11px;
+}
+.admin-shell .admin-user {
+  color: var(--lux-text);
+}
+.admin-shell .live-dot {
+  background: var(--lux-rose);
+  width: 6px;
+  height: 6px;
+}
+.admin-shell .avatar {
+  background: var(--lux-black);
+  color: var(--lux-pearl);
+  border: 1px solid var(--lux-rose);
+  border-radius: 10px;
+}
+.admin-shell .admin-content {
+  padding-top: 36px;
+}
+.admin-shell .admin-heading {
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.admin-shell .admin-heading h1 {
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+.admin-shell .admin-heading p {
+  color: var(--lux-text);
+  font-size: 12px;
+  line-height: 1.8;
+  max-width: 56ch;
+}
+.admin-shell .admin-eyebrow {
+  color: var(--lux-text);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  line-height: 1.7;
+}
+.admin-shell .today-label {
+  background: var(--lux-nude);
+  border-color: var(--lux-border);
+  border-radius: 8px;
+  color: var(--lux-text);
+}
+:is(.admin-shell, .admin-dialog) .admin-btn {
+  background: var(--lux-black) !important;
+  border-color: var(--lux-black) !important;
+  color: var(--lux-pearl) !important;
+  min-height: 42px;
+  padding: 11px 16px !important;
+  border-radius: 8px;
+  font: 500 11px/1.5 var(--font-body);
+}
+:is(.admin-shell, .admin-dialog) .admin-btn:is(:hover, :focus-visible) {
+  background: var(--lux-rose) !important;
+  border-color: var(--lux-rose) !important;
+  color: var(--lux-black) !important;
+}
+:is(.admin-shell, .admin-dialog) .admin-btn.secondary {
+  background: transparent !important;
+  border-color: var(--lux-black) !important;
+  color: var(--lux-black) !important;
+}
+:is(.admin-shell, .admin-dialog) .admin-btn.secondary:is(:hover, :focus-visible) {
+  background: var(--lux-nude) !important;
+}
+:is(.admin-shell, .admin-dialog) .admin-btn.danger {
+  background: #f9e9e7 !important;
+  border-color: #a13d45 !important;
+  color: #822e39 !important;
+}
+:is(.admin-shell, .admin-dialog) .admin-btn.danger:is(:hover, :focus-visible) {
+  background: #f1d6d5 !important;
+}
+.admin-shell .metric-grid {
+  gap: 18px;
+}
+.admin-shell :is(.metric-card, .panel, .data-panel) {
+  border: 1px solid var(--lux-border);
+  border-radius: 14px;
+  background: var(--lux-pearl);
+  box-shadow: 0 6px 24px #11111103;
+}
+.admin-shell .metric-card {
+  padding: 24px;
+}
+.admin-shell .metric-card > span {
+  color: var(--lux-text);
+  font-size: 11px;
+  line-height: 1.6;
+  gap: 12px;
+}
+.admin-shell .metric-icon {
+  background: var(--lux-nude);
+  color: var(--lux-black);
+  border-radius: 8px;
+  min-width: 30px;
+  height: 30px;
+}
+.admin-shell .metric-card strong {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 2.5vw, 34px);
+  letter-spacing: -0.04em;
+  color: var(--lux-black);
+  margin-block: 18px 8px;
+  overflow-wrap: anywhere;
+}
+.admin-shell .metric-card small {
+  color: var(--lux-text);
+  font-size: 10px;
+  line-height: 1.7;
+}
+.admin-shell .metric-card:first-child {
+  background: var(--lux-black);
+  border-color: var(--lux-black);
+}
+.admin-shell .metric-card:first-child :is(strong, span, small) {
+  color: var(--lux-pearl);
+}
+.admin-shell .metric-card:first-child .metric-icon {
+  background: var(--lux-rose);
+  color: var(--lux-black);
+}
+.admin-shell .panel {
+  padding: 26px;
+}
+.admin-shell .panel h2 {
+  font: 500 20px/1.3 var(--font-display);
+  letter-spacing: -0.03em;
+}
+.admin-shell .panel-heading p {
+  color: var(--lux-text);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.admin-shell .panel-heading > :is(a, span) {
+  color: var(--lux-text);
+  font-size: 10px;
+}
+.admin-shell .chart-bars {
+  border-color: var(--lux-border);
+  background: repeating-linear-gradient(0deg, transparent, transparent 47px, #ddd2cc70 48px);
+}
+.admin-shell .chart-legend i,
+.admin-shell .bar-pair > div {
+  background: var(--lux-black);
+}
+.admin-shell .chart-legend i + i,
+.admin-shell .bar-pair > div + div {
+  background: var(--lux-rose);
+}
+.admin-shell :is(.chart-legend, .chart-month > span, .chart-month small) {
+  color: var(--lux-text);
+  font-size: 10px;
+}
+.admin-shell .event-day {
+  background: var(--lux-nude);
+  color: var(--lux-black);
+  border-radius: 8px;
+  font-family: var(--font-display);
+}
+.admin-shell .activity-row {
+  border-color: var(--lux-border);
+}
+.admin-shell .activity-row small {
+  color: var(--lux-text);
+  font-size: 10px;
+}
+.admin-shell .activity-row > :is(svg, a) {
+  color: var(--lux-text);
+}
+.admin-shell .activity-row .avatar {
+  flex-shrink: 0;
+  margin-left: 0;
+}
+.admin-shell .badge,
+.admin-dialog .badge {
+  background: var(--lux-nude);
+  color: var(--lux-text);
+  border: 1px solid var(--lux-border);
+  border-radius: 6px;
+  font: 500 9px/1.5 var(--font-body);
+}
+.admin-shell .badge:is(.active, .delivered, .published, .finalized) {
+  background: var(--lux-black);
+  color: var(--lux-pearl);
+  border-color: var(--lux-black);
+}
+.admin-shell .badge:is(.pending, .draft, .new) {
+  background: var(--lux-nude);
+  color: var(--lux-black);
+  border-color: var(--lux-rose);
+}
+.admin-shell .quick-actions {
+  gap: 12px;
+  padding: 22px 26px;
+}
+.admin-shell .quick-actions a {
+  padding: 10px 14px;
+  border: 1px solid var(--lux-border);
+  border-radius: 8px;
+  color: var(--lux-black);
+  min-height: 42px;
+}
+.admin-shell .quick-actions a:is(:hover, :focus-visible) {
+  background: var(--lux-nude);
+}
+.admin-shell .search-box {
+  background: var(--lux-pearl);
+  border-color: var(--lux-border);
+  border-radius: 8px;
+  min-height: 46px;
+  color: var(--lux-text);
+}
+.admin-shell .search-box input {
+  color: var(--lux-text);
+  font: 400 13px/1.5 var(--font-body);
+}
+.admin-shell :is(.search-box input, input)::placeholder {
+  color: var(--lux-muted);
+  opacity: 1;
+}
+.admin-shell .data-panel {
+  overflow: hidden;
+}
+.admin-shell table {
+  font-family: var(--font-body);
+  font-size: 11px;
+}
+.admin-shell th {
+  background: var(--lux-nude);
+  color: var(--lux-text);
+  padding: 16px 18px;
+  font-size: 10px;
+  font-weight: 500;
+}
+.admin-shell td {
+  color: var(--lux-text);
+  border-color: var(--lux-border);
+  padding: 18px;
+}
+.admin-shell tbody tr:hover {
+  background: #eadfd866;
+}
+.admin-shell .row-actions > :is(a, button) {
+  background: transparent !important;
+  border-color: var(--lux-border) !important;
+  color: var(--lux-black);
+  border-radius: 6px;
+  min-height: 36px;
+  padding: 7px 10px !important;
+  font-size: 10px;
+}
+.admin-shell .row-actions > :is(a, button):is(:hover, :focus-visible) {
+  background: var(--lux-nude) !important;
+  border-color: var(--lux-rose) !important;
+}
+.admin-shell .row-actions > .delete-section {
+  color: #822e39;
+  border-color: #a13d45 !important;
+}
+.admin-shell :is(.pagination, .table-toolbar > span, .empty-state p, .muted, .admin-footer) {
+  color: var(--lux-text);
+}
+.admin-shell .pagination button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--lux-border);
+  border-radius: 8px;
+}
+.admin-shell .empty-state {
+  color: var(--lux-text);
+  padding: 48px 24px;
+}
+.admin-shell .empty-state h2 {
+  color: var(--lux-black);
+  font-family: var(--font-display);
+}
+.admin-shell .empty-state > svg {
+  color: var(--lux-rose);
+}
+.admin-shell .empty-state p {
+  color: var(--lux-text);
+}
+.admin-shell .admin-footer {
+  border-color: var(--lux-border);
+  font: 400 11px/1.7 var(--font-body);
+}
+.admin-shell .admin-footer > span {
+  color: var(--lux-text);
+  font: 500 9px/1.7 var(--font-body);
+  letter-spacing: 0.12em;
+}
+:is(.admin-shell, .admin-dialog) :is(.admin-info, .admin-notice, .admin-alert) {
+  border-radius: 10px;
+  padding: 16px 18px;
+  font: 400 12px/1.8 var(--font-body);
+}
+:is(.admin-shell, .admin-dialog) :is(.admin-info, .admin-notice) {
+  background: var(--lux-nude);
+  color: var(--lux-text);
+  border: 1px solid var(--lux-border);
+  border-left: 3px solid var(--lux-rose);
+}
+:is(.admin-shell, .admin-dialog) .admin-alert {
+  background: #f9e9e7;
+  color: #822e39;
+  border: 1px solid #dfb6b5;
+}
+.admin-dialog {
+  background: var(--lux-pearl);
+  color: var(--lux-text);
+  border: 1px solid var(--lux-border);
+  border-radius: 16px;
+  padding: 30px;
+  font-family: var(--font-body);
+}
+.admin-dialog::backdrop {
+  background: #11111180;
+  backdrop-filter: blur(6px);
+}
+.admin-dialog > header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--lux-border);
+  gap: 16px;
+}
+.admin-dialog h2 {
+  font: 500 clamp(24px, 3vw, 30px)/1.2 var(--font-display);
+  letter-spacing: -0.03em;
+}
+.admin-dialog > header button {
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--lux-black);
+  background: var(--lux-nude);
+}
+.admin-dialog .admin-form {
+  gap: 20px 18px;
+}
+.admin-dialog :is(.admin-form > label, .quote-line label) {
+  color: var(--lux-text);
+  font-size: 11px;
+  line-height: 1.6;
+  gap: 8px;
+}
+.admin-dialog :is(input:not([type='checkbox']), select, textarea),
+.admin-dialog .share-message {
+  border: 1px solid var(--lux-border);
+  border-radius: 8px;
+  background: var(--lux-pearl);
+  color: var(--lux-text);
+  padding: 12px 14px;
+  min-height: 46px;
+  font: 400 14px/1.5 var(--font-body);
+}
+.admin-dialog input[type='checkbox'] {
+  accent-color: var(--lux-black);
+}
+.admin-dialog select option {
+  font: 400 14px var(--font-body);
+}
+.admin-dialog :is(input, select, textarea):focus-visible {
+  outline: 2px solid var(--lux-black);
+  outline-offset: 2px;
+  border-color: var(--lux-rose);
+}
+.admin-dialog .record-detail > div {
+  border-color: var(--lux-border);
+  padding-block: 14px;
+}
+.admin-dialog .record-detail strong {
+  color: var(--lux-text);
+  font-size: 11px;
+}
+.admin-dialog .record-detail pre {
+  font-family: var(--font-body);
+  color: var(--lux-text);
+}
+.admin-dialog .quote-line {
+  border-color: var(--lux-border);
+  background: var(--lux-nude);
+  border-radius: 8px;
+}
+.admin-shell .calendar-grid > strong {
+  background: var(--lux-nude);
+  color: var(--lux-text);
+}
+.admin-shell .calendar-grid > div {
+  background: var(--lux-pearl);
+  border-color: var(--lux-border);
+}
+.admin-shell .calendar-grid button {
+  background: var(--lux-nude);
+  color: var(--lux-black);
+  border-color: var(--lux-border);
+}
+:is(.admin-shell, .admin-dialog, .login-card) :is(button, a):hover {
+  translate: none !important;
+  filter: none !important;
+}
+:is(.admin-shell, .admin-dialog, .login-card) :is(button, a):hover > svg {
+  transform: none !important;
+}
+:is(.admin-shell, .admin-dialog, .login-card) :is(button, a):focus-visible {
+  outline: 2px solid var(--lux-rose);
+  outline-offset: 3px;
+}
+.login-page {
+  background: var(--lux-pearl);
+  color: var(--lux-text);
+  padding: 48px 24px;
+}
+.login-page .login-brand {
+  color: var(--lux-black);
+}
+.login-brand-logo {
+  display: block;
+  width: 230px;
+  max-width: 100%;
+  aspect-ratio: 1430 / 370;
+  background: currentColor;
+  mask: url('/images/umiya-florist-logo.webp') center / contain no-repeat;
+  -webkit-mask: url('/images/umiya-florist-logo.webp') center / contain no-repeat;
+}
+.login-card {
+  max-width: 460px;
+  padding: 32px;
+  margin-top: 36px;
+  border: 1px solid var(--lux-border);
+  border-radius: 16px;
+  background: var(--lux-pearl);
+  box-shadow: 0 16px 48px #11111105;
+}
+.login-card h1 {
+  font-size: clamp(30px, 4vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+.login-card :is(p, label, .eyebrow) {
+  color: var(--lux-text);
+}
+.login-card > p {
+  line-height: 1.8;
+}
+.login-card :is(input, select) {
+  background: var(--lux-pearl);
+  color: var(--lux-text);
+  border: 1px solid var(--lux-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  min-height: 48px;
+  font: 400 14px/1.5 var(--font-body);
+}
+.login-card .button {
+  border-radius: 8px;
+  background: var(--lux-black);
+  color: var(--lux-pearl);
+  border-color: var(--lux-black);
+  min-height: 48px;
+  justify-content: space-between;
+}
+.login-card .button:is(:hover, :focus-visible) {
+  background: var(--lux-rose);
+  color: var(--lux-black);
+  border-color: var(--lux-rose);
+}
+.login-card .text-link {
+  color: var(--lux-black);
+  border: 1px solid var(--lux-border) !important;
+  border-radius: 8px;
+  padding: 12px 14px !important;
+  min-height: 44px;
+  text-decoration: none;
+}
+.login-card .text-link:hover {
+  background: var(--lux-nude);
+}
+.login-card .setup-notice {
+  background: var(--lux-nude);
+  color: var(--lux-text);
+  border-color: var(--lux-border);
+  border-radius: 8px;
+}
+.login-page > small {
+  color: var(--lux-text);
+}
+@media (max-width: 760px) {
+  .admin-shell .admin-sidebar {
+    padding-top: 28px;
+  }
+  .admin-shell .sidebar-label {
+    margin-top: 8px;
+  }
+  .admin-shell .admin-heading {
+    gap: 20px;
+  }
+  .admin-shell .admin-heading h1 {
+    font-size: 30px;
+  }
+  .admin-shell .admin-header {
+    font-size: 10px;
+  }
+  .admin-shell .metric-grid {
+    gap: 12px;
+  }
+  .admin-shell .metric-card {
+    padding: 18px 16px;
+  }
+  .admin-shell .metric-card strong {
+    font-size: 28px;
+  }
+  .admin-shell .metric-card > span {
+    font-size: 10px;
+  }
+  .admin-shell .panel {
+    padding: 20px 18px;
+  }
+  .admin-shell .panel-heading {
+    flex-wrap: wrap;
+  }
+  .admin-dialog {
+    padding: 24px 20px;
+  }
+  .login-page {
+    padding: 32px 20px;
+  }
+  .login-card {
+    padding: 28px 22px;
+  }
+}
+@media (max-width: 459px) {
+  .admin-shell .admin-sidebar {
+    padding: 28px 16px 20px;
+    border: 1px solid #b88a7866;
+    border-radius: 18px;
+  }
+  .admin-shell .admin-sidebar .admin-brand {
+    padding-block: 8px 20px;
+  }
+  .admin-shell .mobile-dock {
+    background: #f7f1ecf5;
+    border-color: var(--lux-border);
+  }
+  .admin-shell .mobile-dock .dock-item {
+    color: var(--lux-black) !important;
+  }
+  .admin-shell .mobile-dock .dock-item.is-active {
+    background: var(--lux-black) !important;
+    color: var(--lux-pearl) !important;
+  }
+  .admin-shell .mobile-dock .dock-item:not(.is-active):hover {
+    background: var(--lux-nude);
+  }
+  .admin-shell .metric-card .metric-icon {
+    display: none;
+  }
+  .admin-shell .metric-card strong {
+    font-size: 25px;
+  }
+  .admin-shell .admin-footer {
+    margin-inline: 16px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 459px) {
+  .admin-shell .admin-sidebar .admin-brand {
+    display: flex;
+    padding: 0 44px 16px 4px;
+    flex-shrink: 0;
+  }
+  .admin-shell .admin-sidebar .admin-brand-logo {
+    width: 150px;
+  }
+}
+/* Explicit contrast and bounded chart scrolling on narrow screens. */
+.admin-shell .admin-sidebar .sidebar-label {
+  color: var(--lux-dusty);
+}
+.admin-shell .data-panel th,
+.admin-shell .pagination > span {
+  color: var(--lux-text);
+}
+.admin-shell .panel {
+  min-width: 0;
+}
+.admin-shell .chart-bars {
+  max-width: 100%;
+  overflow-x: auto;
+  justify-content: flex-start;
+  gap: 16px;
+}
+.admin-shell .chart-month {
+  flex: 1 0 76px;
+  min-width: 76px;
+}
+.admin-shell .chart-bars:focus-visible {
+  outline: 2px solid var(--lux-black);
+  outline-offset: 3px;
+}
+@media (max-width: 370px) {
+  .admin-shell .metric-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.admin-dialog .quote-lines > p,
+.admin-shell .alert-job-note {
+  color: var(--lux-text);
+}
+.admin-shell .event-calendar input {
+  background: var(--lux-pearl);
+  color: var(--lux-text);
+  border-color: var(--lux-border);
+  border-radius: 8px;
+}

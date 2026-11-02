@@ -12,8 +12,13 @@ Bundled reference files were downloaded from Unsplash on 19 October 2026:
 
 Unsplash's published license allows downloading and commercial use, with its stated restrictions: https://unsplash.com/license . Keep the source register and review asset-specific rights/representations before commercial launch.
 
-Fraunces and DM Sans are self-hosted through the existing Fontsource assets and next/font/local under the SIL Open Font License. Preserve their licenses. Legacy unused UI Fontsource packages were removed; bundled PDF fonts and their license files remain unchanged. Lucide uses the ISC license. No Dribbble artwork is included in the shipped assets. The linked Flora reference informed color/editorial direction; the additional named screenshot references were not attached.
+DM Sans (headings) and Montserrat (body/UI) are self-hosted through the existing Fontsource assets and next/font/local under the SIL Open Font License. Preserve their licenses. Legacy unused UI Fontsource packages were removed; bundled PDF fonts and their license files remain unchanged. Lucide uses the ISC license. No Dribbble artwork is included in the shipped assets. The linked Flora reference informed color/editorial direction; the additional named screenshot references were not attached.
 
 A professionally produced flower bloom video or suitable organic petal model was not supplied. The shipped hero uses photography with a coordinated reveal, never describes image scaling as flower growth, and supports reduced motion. Detailed 3D/bloom footage remains an asset-dependent task.
 
 PDF fonts use official Noto Sans, Noto Sans Gujarati and Noto Sans Devanagari static TrueType faces from the Noto project's archived source, embedded in full for compatibility. Font licenses are preserved in `public/fonts/`. Sources: https://github.com/notofonts/noto-fonts/tree/main/hinted/ttf/NotoSans · https://github.com/notofonts/noto-fonts/tree/main/hinted/ttf/NotoSansGujarati · https://github.com/notofonts/noto-fonts/tree/main/hinted/ttf/NotoSansDevanagari .
+
+
+The 31 October 2026 visual theme uses the owner-supplied Black & Rose Gold palette through `src/app/luxury-theme.css`. Heading fonts are bundled locally with their OFL license; no third-party font request is required. The existing logo artwork, photographs, intro paths, GSAP timelines, page content and interactions are retained. The legacy Fraunces package remains available for compatibility.
+
+Typography follow-up: the owner requested DM Sans for headings and Montserrat, sans-serif for paragraphs, navigation, buttons and forms. Both are self-hosted; the luxury palette and existing behavior remain unchanged.

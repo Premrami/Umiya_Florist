@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Flower2, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 export function Login({ configured }: { configured: boolean }) {
   const router = useRouter();
   const form = useRef<HTMLFormElement>(null);
@@ -30,11 +30,8 @@ export function Login({ configured }: { configured: boolean }) {
   }
   return (
     <main className="login-page">
-      <Link href="/" className="wordmark">
-        <Flower2 size={35} />
-        <span>
-          UMIYA<small>F L O R I S T</small>
-        </span>
+      <Link href="/" className="wordmark login-brand" aria-label="Umiya Florist — Home">
+        <span className="login-brand-logo" aria-hidden="true" />
       </Link>
       <div className="login-card">
         <span className="eyebrow">THE STUDIO, BEHIND THE BLOOMS</span>

@@ -1,0 +1,94 @@
+[
+  {
+    "width": 320,
+    "module": "dashboard",
+    "overflow": false,
+    "violations": [],
+    "errors": []
+  },
+  {
+    "width": 320,
+    "module": "clients",
+    "overflow": false,
+    "violations": [],
+    "errors": []
+  },
+  {
+    "width": 320,
+    "module": "client-dialog",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "width": 320,
+    "module": "mobile-menu",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "width": 390,
+    "module": "dashboard",
+    "overflow": false,
+    "violations": [],
+    "errors": []
+  },
+  {
+    "width": 390,
+    "module": "clients",
+    "overflow": false,
+    "violations": [],
+    "errors": []
+  },
+  {
+    "width": 390,
+    "module": "client-dialog",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "width": 390,
+    "module": "mobile-menu",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "width": 768,
+    "module": "dashboard",
+    "overflow": false,
+    "violations": [],
+    "errors": []
+  },
+  {
+    "width": 768,
+    "module": "clients",
+    "overflow": false,
+    "violations": [],
+    "errors": []
+  },
+  {
+    "width": 768,
+    "module": "client-dialog",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "width": 1440,
+    "module": "dashboard",
+    "overflow": false,
+    "violations": [],
+    "errors": []
+  },
+  {
+    "width": 1440,
+    "module": "clients",
+    "overflow": false,
+    "violations": [],
+    "errors": []
+  },
+  {
+    "width": 1440,
+    "module": "client-dialog",
+    "overflow": false,
+    "violations": []
+  }
+]

@@ -1,13 +1,14 @@
 'use client';
 import Image from 'next/image';
 import { FormInput } from './form-input';
+import { InquirySuccess } from './inquiry-success';
 import { formattedAddress } from '@/lib/business-details';
 import Link from 'next/link';
 import { MobileDock } from './mobile-dock';
 import { useContext, useEffect, useId, useRef, useState } from 'react';
 import {
   House,
-  Info,
+  BookOpen,
   Sprout,
   ArrowUpRight,
   ArrowDown,
@@ -259,7 +260,7 @@ export function Website({ content: c }: { content: PublicContent }) {
           ...nav.slice(0, 4).map(([label, id], index) => ({
             id,
             label,
-            icon: [House, Info, Flower2, Sprout][index],
+            icon: [House, BookOpen, Flower2, Sprout][index],
             href: '#' + id,
             active: activeSection === id,
           })),
@@ -334,16 +335,28 @@ export function Website({ content: c }: { content: PublicContent }) {
           <span className="hero-edition">FRESH FLOWERS. TIMELESS FEELINGS.</span>
         </section>
         <div className="ribbon">
-          {[
-            'BOUQUETS & BLOOMS',
-            'WEDDINGS & CELEBRATIONS',
-            'DAILY DEVOTION',
-            'THOUGHTFULLY, ALWAYS',
-          ].map((n) => (
-            <span key={n}>
-              {n} <i>✳</i>
-            </span>
-          ))}
+          <div className="ribbon-window" role="region" aria-label="Floral services" tabIndex={0}>
+            <div className="ribbon-track">
+              {[0, 1].map((copy) => (
+                <div
+                  className="ribbon-group"
+                  key={copy}
+                  aria-hidden={copy === 1 ? true : undefined}
+                >
+                  {[
+                    'BOUQUETS & BLOOMS',
+                    'WEDDINGS & CELEBRATIONS',
+                    'DAILY DEVOTION',
+                    'THOUGHTFULLY, ALWAYS',
+                  ].map((name) => (
+                    <span key={name}>
+                      {name} <i aria-hidden="true">✳</i>
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <section id="about" className="about section-pad">
           <div className="about-image">
@@ -719,16 +732,28 @@ export function Website({ content: c }: { content: PublicContent }) {
         </section>
       </main>
       <footer>
-        <nav className="footer-nav" aria-label="Footer navigation">
-          {nav.map(([name, id]) => (
-            <a key={id} href={'#' + id}>
-              {name}
-            </a>
-          ))}
-        </nav>
-        <div className="footer-top">
-          <Brand name={c.settings.name} logo={c.settings.logo_url} />
-          <a href="#home">Back to top ↑</a>
+        <div className="footer-main">
+          <div className="footer-top">
+            <Brand name={c.settings.name} logo={c.settings.logo_url} />
+            <a href="#home">Back to top ↑</a>
+          </div>
+          <nav className="footer-nav" aria-label="Footer navigation">
+            {[
+              { title: 'Explore', ids: ['home', 'about', 'work', 'testimonials'] },
+              { title: 'Flowers & occasions', ids: ['flowers', 'pooja', 'decorations', 'contact'] },
+            ].map((group) => (
+              <div className="footer-link-group" key={group.title}>
+                <p className="footer-link-title">{group.title}</p>
+                {nav
+                  .filter(([, id]) => group.ids.includes(id))
+                  .map(([name, id]) => (
+                    <a key={id} href={'#' + id}>
+                      {name}
+                    </a>
+                  ))}
+              </div>
+            ))}
+          </nav>
         </div>
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} Umiya Florist</span>
@@ -803,9 +828,11 @@ export function Website({ content: c }: { content: PublicContent }) {
 function InquiryForm({ type, compact = false }: { type: string; compact?: boolean }) {
   const [busy, setBusy] = useState(false),
     [status, setStatus] = useState(''),
+    [success, setSuccess] = useState(false),
     [summary, setSummary] = useState<Record<string, string>>({}),
     key = useRef('');
   const submitting = useRef(false);
+  const submitButton = useRef<HTMLButtonElement>(null);
   const statusId = useId();
   const custom = type === 'Custom Bouquet',
     pooja = type === 'Pooja Flower Subscription',
@@ -856,7 +883,7 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
         }
         throw new Error(json.error);
       }
-      setStatus('Thank you. Your inquiry has been received. We’ll be in touch.');
+      setSuccess(true);
       form.reset();
       setSummary({});
       key.current = '';
@@ -1031,7 +1058,7 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
       <p className="privacy-note">
         We use your details to respond to this inquiry. <a href="/privacy">Privacy notice</a>
       </p>
-      <button className="button" disabled={busy}>
+      <button ref={submitButton} className="button" disabled={busy}>
         {busy ? 'Sending…' : 'Send your inquiry'}
         <ArrowUpRight size={18} />
       </button>
@@ -1040,6 +1067,7 @@ function InquiryForm({ type, compact = false }: { type: string; compact?: boolea
           {status}
         </p>
       )}
+      {success && <InquirySuccess onDismiss={() => setSuccess(false)} returnFocus={submitButton} />}
     </form>
   );
 }

@@ -3,28 +3,30 @@ import localFont from 'next/font/local';
 import { WebVitals } from '@/components/web-vitals';
 import './globals.css';
 import './brand-theme.css';
+import './luxury-theme.css';
+import './studio-theme.css';
 const displayFont = localFont({
   src: [
     {
-      path: '../../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2',
+      path: '../../node_modules/@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2',
       style: 'normal',
-      weight: '100 900',
+      weight: '100 1000',
     },
     {
-      path: '../../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-wght-italic.woff2',
+      path: '../../node_modules/@fontsource-variable/dm-sans/files/dm-sans-latin-wght-italic.woff2',
       style: 'italic',
-      weight: '100 900',
+      weight: '100 1000',
     },
   ],
-  variable: '--font-fraunces',
-  display: 'swap',
-  adjustFontFallback: 'Times New Roman',
-});
-const bodyFont = localFont({
-  src: '../../node_modules/@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2',
   variable: '--font-dm-sans',
   display: 'swap',
-  weight: '100 1000',
+  adjustFontFallback: 'Arial',
+});
+const bodyFont = localFont({
+  src: '../../node_modules/@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2',
+  variable: '--font-montserrat',
+  display: 'swap',
+  weight: '100 900',
 });
 export const metadata: Metadata = {
   title: 'Umiya Florist',
