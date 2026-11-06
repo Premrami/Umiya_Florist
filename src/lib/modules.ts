@@ -233,7 +233,7 @@ export const specs: Record<string, ModuleSpec> = {
       f('name', 'Collection name'),
       f('category', 'Category'),
       f('description', 'Description', 'textarea', false),
-      f('image_url', 'Image URL (from media library)'),
+      f('image_url', 'Photo', 'image'),
       f('price', 'Starting price (paise)', 'number', false),
       f('sort_order', 'Display order', 'number'),
       f('status', 'Publishing', 'select', true, ['draft', 'published', 'archived']),
@@ -309,7 +309,7 @@ export const specs: Record<string, ModuleSpec> = {
       ]),
       f('draft.headline', 'Headline'),
       f('draft.description', 'Description', 'textarea'),
-      f('draft.image_url', 'Image URL', 'url', false),
+      f('draft.image_url', 'Section photo', 'image', false),
     ],
     columns: ['key', 'draft', 'published_at'],
   },
@@ -471,7 +471,7 @@ export const specs: Record<string, ModuleSpec> = {
       f('private.inquiry_sms_enabled', 'Enable SMS inquiry alerts to admin', 'checkbox', false),
       f('public.name', 'Business name'),
       f('public.email', 'Business email', 'email', false),
-      f('public.logo_url', 'Logo image URL', 'url', false),
+      f('public.logo_url', 'Business logo', 'image', false),
       f('public.service_areas', 'Service areas', 'text', false),
       f('public.map_url', 'Map URL', 'url', false),
       f('public.google_business', 'Google Business Profile URL', 'url', false),
@@ -503,10 +503,10 @@ specs.services = {
   fields: [
     f('name', 'Service title'),
     f('description', 'Description', 'textarea'),
-    f('image_url', 'Image URL'),
+    f('image_url', 'Photo', 'image'),
     f('status', 'Publishing', 'select', true, ['draft', 'published', 'archived']),
   ],
-  columns: ['name', 'description', 'status'],
+  columns: ['image_url', 'name', 'description', 'status'],
 };
 specs.portfolio = {
   table: 'portfolio_projects',
@@ -522,7 +522,7 @@ specs.portfolio = {
   fields: [
     f('name', 'Project title'),
     f('description', 'Description', 'textarea'),
-    f('image_url', 'Approved image URL'),
+    f('image_url', 'Approved photo', 'image'),
     f('permission_confirmed', 'Publication permission confirmed', 'checkbox'),
     f('status', 'Publishing', 'select', true, ['draft', 'published', 'archived']),
   ],
@@ -553,7 +553,7 @@ specs.social = {
   schema: z.object({ name: text, image_url: image, alt_text: text, status: publication }),
   fields: [
     f('name', 'Caption'),
-    f('image_url', 'Image URL'),
+    f('image_url', 'Photo', 'image'),
     f('alt_text', 'Image description'),
     f('status', 'Publishing', 'select', true, ['draft', 'published', 'archived']),
   ],

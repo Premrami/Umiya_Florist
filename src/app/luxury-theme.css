@@ -1339,3 +1339,278 @@ body {
     gap: 8px 20px;
   }
 }
+
+/* Occasion albums share the existing inquiry modal behavior and brand palette. */
+.website .occasion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+}
+.website .occasion-actions .button {
+  min-width: 0;
+  min-height: 48px;
+  padding: 14px 18px;
+  font-size: 12px;
+  white-space: normal;
+}
+.website .decorations .occasion-gallery-button {
+  background: transparent;
+  color: var(--lux-pearl);
+  border: 1px solid var(--lux-pearl);
+}
+.website .decorations .occasion-gallery-button:is(:hover, :focus-visible) {
+  background: var(--lux-rose);
+  color: var(--lux-black);
+}
+.occasion-gallery-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(1100px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 40px);
+  padding: clamp(20px, 4vw, 48px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--lux-pearl);
+  color: var(--lux-text);
+  border: 1px solid var(--lux-border);
+  border-radius: 12px;
+}
+.occasion-gallery-dialog::backdrop {
+  background: #111111b3;
+}
+.occasion-gallery-dialog .dialog-close {
+  position: sticky;
+  top: 0;
+  float: right;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 0 12px 12px;
+  border: 1px solid var(--lux-black);
+  z-index: 2;
+}
+.occasion-gallery-content {
+  min-width: 0;
+}
+.occasion-gallery-content .eyebrow {
+  color: var(--lux-muted);
+  font-size: 10px;
+}
+.occasion-gallery-content h2 {
+  margin: 14px 0;
+  font: 500 clamp(25px, 4vw, 42px)/1.2 var(--font-display);
+  color: var(--lux-black);
+  overflow-wrap: anywhere;
+}
+.occasion-gallery-content > p {
+  margin: 0 0 24px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.occasion-gallery-grid {
+  clear: both;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.occasion-gallery-grid > button {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+  overflow: hidden;
+  border: 1px solid var(--lux-border);
+  border-radius: 8px;
+  background: var(--lux-nude);
+  color: var(--lux-text);
+}
+.occasion-gallery-grid img {
+  display: block;
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+.occasion-gallery-grid span {
+  padding: 12px;
+  font-size: 11px;
+}
+.occasion-gallery-content :is(.occasion-back, .occasion-gallery-controls button) {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--lux-black);
+  background: transparent;
+  color: var(--lux-black);
+  border-radius: 8px;
+  padding: 12px 14px;
+  min-height: 44px;
+  font-size: 12px;
+}
+.occasion-gallery-content button {
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+.occasion-gallery-content button:is(:hover, :focus-visible) {
+  background-color: var(--lux-nude);
+  transform: none;
+}
+.occasion-gallery-content button:focus-visible {
+  outline: 2px solid var(--lux-black);
+  outline-offset: 3px;
+}
+.occasion-gallery-content button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.occasion-gallery-full {
+  clear: both;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--lux-nude);
+}
+.occasion-gallery-full img {
+  display: block;
+  width: 100%;
+  height: min(65dvh, 680px);
+  object-fit: contain;
+}
+.occasion-gallery-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 16px;
+  font-size: 12px;
+}
+@media (max-width: 600px) {
+  .website .occasion-actions {
+    flex-direction: column;
+  }
+  .website .occasion-actions .button {
+    width: 100%;
+  }
+  .occasion-gallery-dialog {
+    width: calc(100vw - 20px);
+    max-width: calc(100vw - 20px);
+    padding: 18px;
+    max-height: calc(100dvh - 24px);
+  }
+  .occasion-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .occasion-gallery-grid img {
+    height: 180px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .occasion-gallery-content button {
+    transition: none;
+  }
+}
+
+/* A simple rose-gold line follows the card order at every layout breakpoint. */
+.website .why > .detail-journey:last-child {
+  position: relative;
+  isolation: isolate;
+  gap: 48px 44px;
+}
+.detail-journey > article {
+  position: relative;
+  z-index: 1;
+}
+.detail-journey > .detail-thread {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+  color: var(--lux-rose);
+}
+.detail-thread path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.detail-thread-rail {
+  stroke: var(--lux-rose);
+  stroke-width: 1.4;
+  opacity: 0.65;
+}
+.detail-thread-flow {
+  stroke: var(--lux-rose);
+  stroke-width: 2.8;
+  stroke-dasharray: 0.16 1.16;
+  stroke-dashoffset: 0.16;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px #b88a78b3);
+}
+.detail-journey[data-journey-active='true'] .detail-thread-rail {
+  animation: detail-thread-draw 1.3s cubic-bezier(0.22, 1, 0.36, 1) var(--draw-delay) both;
+}
+.detail-thread-flow {
+  animation: detail-thread-travel 6.6s linear calc(1.2s + var(--thread-delay)) infinite;
+  animation-play-state: paused;
+}
+.detail-journey[data-journey-active='true'] .detail-thread-flow {
+  animation-play-state: running;
+}
+@keyframes detail-thread-draw {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    opacity: 0.65;
+  }
+}
+@keyframes detail-thread-travel {
+  0% {
+    stroke-dashoffset: 0.16;
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  22% {
+    stroke-dashoffset: -1.16;
+    opacity: 0;
+  }
+  100% {
+    stroke-dashoffset: -1.16;
+    opacity: 0;
+  }
+}
+@media (max-width: 600px) {
+  .website .why > .detail-journey:last-child {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 44px;
+  }
+  .website .detail-journey > article {
+    padding: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .detail-journey .detail-thread-rail,
+  .detail-journey[data-journey-active='true'] .detail-thread-rail,
+  .detail-journey .detail-thread-flow {
+    animation: none;
+  }
+  .detail-journey .detail-thread-flow {
+    opacity: 0;
+  }
+}

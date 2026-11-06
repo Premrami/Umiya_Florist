@@ -15,6 +15,13 @@ export async function GET(req: Request, ctx: { params: Promise<{ module: string 
     const u = new URL(req.url),
       page = Math.max(0, Number(u.searchParams.get('page') ?? 0));
     let query = db.from(spec.table).select('*', { count: 'exact' });
+    if (module === 'services')
+      query =
+        u.searchParams.get('show_deleted') === '1'
+          ? query.eq('status', 'archived')
+          : query.neq('status', 'archived');
+    if (module === 'cms')
+      query = query.in('key', specs.cms.fields.find((field) => field.key === 'key')!.options!);
     const search = (u.searchParams.get('search') ?? '')
       .replace(/[^a-zA-Z0-9 +@.-]/g, '')
       .slice(0, 100);

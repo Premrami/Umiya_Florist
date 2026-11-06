@@ -204,3 +204,29 @@ test('contact inquiry shows a responsive confirmation and Escape returns focus',
   await expect(form.getByLabel('Your name', { exact: true })).toHaveValue('');
   expect(requests).toBe(1);
 });
+
+test('occasion gallery opens beside inquiry action, browses its photos and restores focus', async ({
+  page,
+}) => {
+  await page.goto('/?intro=0');
+  const opener = page.getByRole('button', { name: 'View wedding gallery', exact: true });
+  await opener.click();
+  const dialog = page.getByRole('dialog', { name: 'Weddings gallery', exact: true });
+  await expect(dialog).toBeVisible();
+  expect(await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+  const first = dialog.getByRole('button', { name: 'Open weddings photo 1', exact: true });
+  if (await first.count()) {
+    await first.click();
+    await expect(dialog.getByRole('status')).toContainText('Photo 1 of');
+    await dialog.getByRole('button', { name: 'Back to gallery', exact: true }).click();
+    await expect(first).toBeFocused();
+  } else await expect(dialog).toContainText('Photos for this occasion are being gathered');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(opener).toBeFocused();
+  await page.getByRole('button', { name: 'Balloon Decorations', exact: true }).click();
+  await page.getByRole('button', { name: 'View balloon decoration gallery', exact: true }).click();
+  await expect(
+    page.getByRole('dialog', { name: 'Balloon Decorations gallery', exact: true }),
+  ).toBeVisible();
+});

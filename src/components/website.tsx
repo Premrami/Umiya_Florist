@@ -1,7 +1,16 @@
 'use client';
 import Image from 'next/image';
 import { FormInput } from './form-input';
+import { DetailJourney } from './detail-journey';
 import { InquirySuccess } from './inquiry-success';
+import { OccasionGallery } from './occasion-gallery';
+import {
+  occasions,
+  findOccasionService,
+  occasionPhotos,
+  occasionGalleryLabel,
+  occasionCoverKey,
+} from '@/lib/occasions';
 import { formattedAddress } from '@/lib/business-details';
 import Link from 'next/link';
 import { MobileDock } from './mobile-dock';
@@ -146,6 +155,7 @@ export function Website({ content: c }: { content: PublicContent }) {
     [item, setItem] = useState<CatalogItem | null>(null),
     [inquiry, setInquiry] = useState(''),
     [service, setService] = useState('Weddings'),
+    [occasionAlbum, setOccasionAlbum] = useState<string | null>(null),
     [gallery, setGallery] = useState<number | null>(null);
   const hero = c.sections.hero ?? {},
     about = c.sections.about ?? {},
@@ -185,6 +195,7 @@ export function Website({ content: c }: { content: PublicContent }) {
     setInquiry(type);
   };
   const categories = ['All flowers', ...new Set(c.catalog.map((x) => x.category))];
+  const selectedService = findOccasionService(c.services, service);
   return (
     <div className="website" ref={root}>
       {c.preview && (
@@ -521,18 +532,7 @@ export function Website({ content: c }: { content: PublicContent }) {
             </button>
           </div>
           <div className="event-tabs">
-            {[
-              'Weddings',
-              'Engagements',
-              'Birthdays',
-              'Anniversaries',
-              'Corporate Events',
-              'Religious Ceremonies',
-              'Home Decorations',
-              'Artificial Flowers',
-              'Balloon Decorations',
-              'Custom Events',
-            ].map((s) => (
+            {occasions.map((s) => (
               <button
                 key={s}
                 className={service === s ? 'active' : ''}
@@ -547,8 +547,12 @@ export function Website({ content: c }: { content: PublicContent }) {
             <div className="section-image-viewport">
               <Image
                 fill
-                src={c.services.find((x) => x.name === service)?.image_url || photos.wedding}
-                alt="Editorial reference for floral event styling"
+                src={
+                  c.sections[occasionCoverKey(service)]?.image_url ||
+                  selectedService?.image_url ||
+                  photos.wedding
+                }
+                alt={service + ' floral decoration'}
                 sizes="100vw"
               />
             </div>
@@ -560,12 +564,23 @@ export function Website({ content: c }: { content: PublicContent }) {
                 <em>with a little wonder.</em>
               </h3>
               <p>
-                {c.services.find((x) => x.name === service)?.description ||
+                {selectedService?.description ||
                   'From the first idea to the final stem, let’s create a setting that feels entirely yours.'}
               </p>
-              <button className="button light" onClick={() => open(service)}>
-                Let’s dream together <ArrowUpRight size={18} />
-              </button>
+              <div className="occasion-actions">
+                <button className="button light" onClick={() => open(service)}>
+                  Let’s dream together <ArrowUpRight size={18} />
+                </button>
+                <button
+                  className="button light occasion-gallery-button"
+                  onClick={(event) => {
+                    event.currentTarget.focus({ preventScroll: true });
+                    setOccasionAlbum(service);
+                  }}
+                >
+                  {occasionGalleryLabel(service)} <ArrowUpRight size={18} />
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -627,7 +642,7 @@ export function Website({ content: c }: { content: PublicContent }) {
               </>
             )}
           </h2>
-          <div>
+          <DetailJourney>
             {[
               ['01', 'Freshness, first', 'Beautiful stems, chosen with care.'],
               ['02', 'Made for you', 'Personal arrangements for your occasion.'],
@@ -640,7 +655,7 @@ export function Website({ content: c }: { content: PublicContent }) {
                 <p>{d}</p>
               </article>
             ))}
-          </div>
+          </DetailJourney>
         </section>
         <section id="testimonials" className="testimonials section-pad">
           <div className="eyebrow">WORDS WE TREASURE</div>
@@ -764,6 +779,18 @@ export function Website({ content: c }: { content: PublicContent }) {
           </div>
         </div>
       </footer>
+      {occasionAlbum && (
+        <Modal
+          title={occasionAlbum + ' gallery'}
+          className="occasion-gallery-dialog"
+          onClose={() => setOccasionAlbum(null)}
+        >
+          <OccasionGallery
+            occasion={occasionAlbum}
+            photos={occasionPhotos(c.services, occasionAlbum)}
+          />
+        </Modal>
+      )}
       {item && (
         <Modal title={item.name} className="collection-dialog" onClose={() => setItem(null)}>
           <Image src={item.image_url || photos.roses} width={600} height={650} alt={item.name} />

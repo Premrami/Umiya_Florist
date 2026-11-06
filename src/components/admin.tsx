@@ -1,5 +1,9 @@
 'use client';
 import { FormInput } from './form-input';
+import Image from 'next/image';
+import { approvedImageUrl } from '@/lib/studio-media';
+import { StudioImageField } from './studio-image-field';
+import { StudioOccasionGallery } from './studio-occasion-gallery';
 import { LaunchReadiness } from './launch-readiness';
 import Link from 'next/link';
 import { MobileDock } from './mobile-dock';
@@ -118,11 +122,13 @@ function value(key: string, v: any) {
 }
 export function Admin({ module, profile }: { module: string; profile: Row }) {
   const router = useRouter();
+  const [restoringPhotoId, setRestoringPhotoId] = useState<string | null>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [rows, setRows] = useState<Row[]>([]),
     [count, setCount] = useState(0),
     [page, setPage] = useState(0),
     [search, setSearch] = useState(''),
+    [showDeletedPhotos, setShowDeletedPhotos] = useState(false),
     [busy, setBusy] = useState(true),
     [error, setError] = useState(''),
     [notice, setNotice] = useState(''),
@@ -184,6 +190,7 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
   ]
     .filter((item) => !specs[item] || can(profile.role, specs[item].permission))
     .slice(0, 3);
+  const [galleryUpload, setGalleryUpload] = useState(false);
   const spec = specs[module],
     title =
       module === 'dashboard'
@@ -199,7 +206,7 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
         setOverview((await api('/api/admin/overview')).data);
       } else {
         const r = await api(
-          `/api/admin/${module}?page=${page}&search=${encodeURIComponent(search)}`,
+          `/api/admin/${module}?page=${page}&search=${encodeURIComponent(search)}${module === 'services' && showDeletedPhotos ? '&show_deleted=1' : ''}`,
         );
         setRows(r.data ?? []);
         setCount(r.count ?? 0);
@@ -209,7 +216,7 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
     } finally {
       setBusy(false);
     }
-  }, [module, page, search]);
+  }, [module, page, search, showDeletedPhotos]);
   useEffect(() => {
     const timer = setTimeout(load, 200);
     return () => clearTimeout(timer);
@@ -309,6 +316,35 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
           Convert to client
         </button>
       )}
+      {module === 'services' &&
+        can(profile.role, 'content') &&
+        (row.status === 'archived' ? (
+          <button
+            disabled={restoringPhotoId === row.id}
+            onClick={async () => {
+              if (restoringPhotoId === row.id) return;
+              setRestoringPhotoId(row.id);
+              try {
+                await api('/api/admin/decoration-photo', { id: row.id, action: 'restore' });
+                setNotice('Photo restored as a draft. Edit and publish it when ready.');
+                await load();
+              } catch (error) {
+                setError(error instanceof Error ? error.message : 'Could not restore the photo.');
+              } finally {
+                setRestoringPhotoId(null);
+              }
+            }}
+          >
+            Restore photo
+          </button>
+        ) : (
+          <button
+            className="delete-section"
+            onClick={() => setAction({ name: 'delete_decoration_photo', row })}
+          >
+            Delete photo
+          </button>
+        ))}
       {module === 'inquiries' && can(profile.role, 'crm') && (
         <button
           className="delete-section"
@@ -791,6 +827,23 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
                       </button>
                     </>
                   )}
+                  {module === 'services' && (
+                    <button
+                      className="admin-btn secondary"
+                      aria-pressed={showDeletedPhotos}
+                      onClick={() => {
+                        setPage(0);
+                        setShowDeletedPhotos(!showDeletedPhotos);
+                      }}
+                    >
+                      {showDeletedPhotos ? 'Show active photos' : 'Show deleted photos'}
+                    </button>
+                  )}
+                  {module === 'services' && (
+                    <button className="admin-btn secondary" onClick={() => setGalleryUpload(true)}>
+                      <ImageIcon size={16} /> Manage occasion photos
+                    </button>
+                  )}
                   {module === 'media' && (
                     <button className="admin-btn" onClick={() => setAction({ name: 'upload' })}>
                       Upload public image
@@ -856,7 +909,11 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
                         <tr>
                           {spec.columns.map((k) => (
                             <th key={k} scope="col">
-                              {human(k)}
+                              {module === 'services' && k === 'image_url'
+                                ? 'Gallery photo'
+                                : module === 'services' && k === 'name'
+                                  ? 'Occasion'
+                                  : human(k)}
                             </th>
                           ))}
                           <th>Actions</th>
@@ -867,7 +924,19 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
                           <tr key={r.id}>
                             {spec.columns.map((k) => (
                               <td key={k}>
-                                {k === 'status' ? (
+                                {module === 'services' &&
+                                k === 'image_url' &&
+                                typeof r[k] === 'string' &&
+                                approvedImageUrl(r[k]) ? (
+                                  <Image
+                                    className="studio-service-thumbnail"
+                                    src={r[k]}
+                                    width={72}
+                                    height={64}
+                                    sizes="72px"
+                                    alt={r.name + ' gallery photo'}
+                                  />
+                                ) : k === 'status' ? (
                                   <span className={'badge ' + r[k]}>{human(r[k])}</span>
                                 ) : k === 'customer_id' ? (
                                   (customers.find((c) => c.id === r[k])?.name ?? value(k, r[k]))
@@ -908,6 +977,28 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
           Thoughtfully organised. Beautifully in bloom.<span>UMIYA STUDIO</span>
         </footer>
       </div>
+      {galleryUpload && (
+        <Dialog title="Manage occasion photos" onClose={() => setGalleryUpload(false)}>
+          <StudioOccasionGallery
+            onSave={async (data) => {
+              await api('/api/admin/occasion-gallery', data);
+              setNotice(
+                data.placement === 'cover'
+                  ? data.status === 'published'
+                    ? 'Main section image updated for ' + data.occasion + '.'
+                    : 'Main section image saved as a draft for ' + data.occasion + '.'
+                  : data.status === 'published'
+                    ? 'Gallery photos published for ' + data.occasion + '.'
+                    : 'Gallery photos saved as drafts for ' + data.occasion + '.',
+              );
+            }}
+            onDone={() => {
+              setGalleryUpload(false);
+              void load();
+            }}
+          />
+        </Dialog>
+      )}
       {edit && module === 'quotations' && (
         <QuotationDialog
           row={edit}
@@ -942,6 +1033,15 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
           customers={customers}
           onClose={() => setAction(null)}
           onSubmit={async (values) => {
+            if (action.name === 'delete_decoration_photo') {
+              await api('/api/admin/decoration-photo', { id: action.row!.id, action: 'remove' });
+              setNotice(
+                'Photo deleted from the gallery. You can restore it from Show deleted photos.',
+              );
+              setAction(null);
+              await load();
+              return;
+            }
             if (action.name === 'invite') {
               const r = await api('/api/admin/invite', values);
               setNotice(r.message);
@@ -1122,14 +1222,15 @@ function Dialog({
   onClose: () => void;
   children: React.ReactNode;
 }) {
+  const titleId = useId();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     ref.current?.showModal();
   }, []);
   return (
-    <dialog ref={ref} className="admin-dialog" onClose={onClose}>
+    <dialog ref={ref} className="admin-dialog" aria-labelledby={titleId} onClose={onClose}>
       <header>
-        <h2>{title}</h2>
+        <h2 id={titleId}>{title}</h2>
         <button aria-label="Close dialog" onClick={() => ref.current?.close()}>
           <X size={20} />
         </button>
@@ -1157,14 +1258,36 @@ function FormDialog({
 }) {
   const [error, setError] = useState(''),
     [busy, setBusy] = useState(false);
+  const [pendingImages, setPendingImages] = useState<Record<string, boolean>>({});
+  const imageBusy = Object.values(pendingImages).some(Boolean);
   const errorId = useId();
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (imageBusy) {
+      setError('Please wait for the photo upload to finish.');
+      return;
+    }
     setBusy(true);
     setError('');
     const form = e.currentTarget;
     const flat = Object.fromEntries(new FormData(form)),
       data: Row = {};
+    const missingImage = fields.find(
+      (field) => field.type === 'image' && field.required && !flat[field.key],
+    );
+    if (missingImage) {
+      setError('Please choose a photo for ' + missingImage.label.toLowerCase() + '.');
+      setBusy(false);
+      const input = form.elements.namedItem(missingImage.key);
+      const trigger =
+        input instanceof HTMLElement
+          ? input
+              .closest('.studio-image-field')
+              ?.querySelector<HTMLButtonElement>('[data-image-trigger]')
+          : null;
+      trigger?.focus();
+      return;
+    }
     for (const f of fields) if (f.type === 'checkbox') flat[f.key] = flat[f.key] ? 'true' : '';
     for (const [k, v] of Object.entries(flat)) {
       const checkbox = fields.find((f) => f.key === k)?.type === 'checkbox';
@@ -1179,7 +1302,13 @@ function FormDialog({
       await onSave(data);
     } catch (e) {
       if (e instanceof Error && 'field' in e && typeof e.field === 'string') {
-        const field = form.elements.namedItem(e.field);
+        const input = form.elements.namedItem(e.field);
+        const field =
+          input instanceof HTMLElement && input.closest('.studio-image-field')
+            ? input
+                .closest('.studio-image-field')
+                ?.querySelector<HTMLElement>('[data-image-trigger]')
+            : input;
         if (field instanceof HTMLElement) {
           field.setAttribute('aria-invalid', 'true');
           field.setAttribute('aria-describedby', errorId);
@@ -1204,6 +1333,19 @@ function FormDialog({
       >
         {fields.map((f) => {
           const val = f.key.split('.').reduce<any>((v, k) => v?.[k], initial) ?? '';
+          if (f.type === 'image')
+            return (
+              <StudioImageField
+                key={f.key}
+                name={f.key}
+                label={f.label}
+                initialValue={String(val)}
+                required={f.required}
+                onBusyChange={(uploading) =>
+                  setPendingImages((current) => ({ ...current, [f.key]: uploading }))
+                }
+              />
+            );
           return (
             <label key={f.key}>
               {f.label}
@@ -1253,8 +1395,8 @@ function FormDialog({
             {error}
           </p>
         )}
-        <button className="admin-btn" disabled={busy}>
-          {busy ? 'Saving…' : 'Save changes'}
+        <button className="admin-btn" disabled={busy || imageBusy}>
+          {imageBusy ? 'Uploading photo…' : busy ? 'Saving…' : 'Save changes'}
           <Check size={16} />
         </button>
       </form>
@@ -1394,6 +1536,8 @@ function ActionDialog({
     ],
     finalize: [],
   };
+  if (action === 'delete_decoration_photo')
+    return <DeleteDecorationPhotoDialog row={row!} onClose={onClose} onSubmit={onSubmit} />;
   if (action === 'delete_section' || action === 'delete_inquiry')
     return (
       <DeleteSectionDialog
@@ -1425,6 +1569,68 @@ function ActionDialog({
         })
       }
     />
+  );
+}
+function DeleteDecorationPhotoDialog({
+  row,
+  onClose,
+  onSubmit,
+}: {
+  row: Row;
+  onClose: () => void;
+  onSubmit: (values: Row) => Promise<void>;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const submitting = useRef(false);
+  return (
+    <Dialog title={'Delete photo from ' + row.name + '?'} onClose={onClose}>
+      {typeof row.image_url === 'string' && approvedImageUrl(row.image_url) && (
+        <Image
+          className="decoration-delete-preview"
+          src={row.image_url}
+          width={560}
+          height={320}
+          alt={row.name + ' photo to delete'}
+          sizes="(max-width:600px) 90vw, 560px"
+        />
+      )}
+      <p className="admin-info">
+        This removes the photo from this occasion’s gallery. The image stays in your Media library,
+        and the main section image stays the same. You can restore the gallery photo from Show
+        deleted photos.
+      </p>
+      {error && (
+        <p className="admin-alert" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="toolbar">
+        <button className="admin-btn secondary" disabled={busy} onClick={onClose}>
+          Cancel
+        </button>
+        <button
+          className="admin-btn danger"
+          disabled={busy}
+          onClick={async () => {
+            if (submitting.current) return;
+            submitting.current = true;
+            setBusy(true);
+            setError('');
+            try {
+              await onSubmit({});
+            } catch (reason) {
+              setError(reason instanceof Error ? reason.message : 'Could not delete this photo.');
+            } finally {
+              submitting.current = false;
+              setBusy(false);
+            }
+          }}
+        >
+          {busy ? 'Deleting…' : 'Delete photo'}
+        </button>
+      </div>
+    </Dialog>
   );
 }
 function DeleteSectionDialog({

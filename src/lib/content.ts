@@ -42,7 +42,7 @@ export async function publicContent({ fresh = false } = {}): Promise<PublicConte
     db.from('public_site_settings').select('*'),
     db.from('portfolio_projects').select('*').eq('status', 'published'),
     db.from('testimonials').select('*').eq('status', 'published'),
-    db.from('services').select('*').eq('status', 'published'),
+    db.from('services').select('*').eq('status', 'published').order('created_at').order('id'),
     db.from('social_posts').select('*').eq('status', 'published'),
     db.from('faqs').select('*').eq('status', 'published'),
   ]);

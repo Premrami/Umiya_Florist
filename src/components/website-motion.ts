@@ -58,12 +58,15 @@ export function startWebsiteMotion(root: RefObject<HTMLDivElement | null>) {
       gsap.utils
         .toArray<HTMLElement>('.flower-grid,.portfolio-grid,.why > div:last-child')
         .forEach((grid) => {
-          if (!belowFold(grid) || !grid.children.length) return;
-          gsap.from(Array.from(grid.children), {
+          const cards = Array.from(grid.children).filter(
+            (child) => !child.hasAttribute('data-journey-decoration'),
+          );
+          if (!belowFold(grid) || !cards.length) return;
+          gsap.from(cards, {
             y: 32,
             opacity: 0,
             duration: 1.05,
-            stagger: Math.min(0.11, 0.44 / grid.children.length),
+            stagger: Math.min(0.11, 0.44 / cards.length),
             ease: 'power2.out',
             clearProps: 'transform,opacity',
             scrollTrigger: { trigger: grid, start: 'top 93%', once: true },
