@@ -8,7 +8,6 @@ test('public sections, anchor targets and readable server content', async ({ pag
   for (const id of [
     'home',
     'about',
-    'flowers',
     'pooja',
     'decorations',
     'work',
@@ -16,6 +15,7 @@ test('public sections, anchor targets and readable server content', async ({ pag
     'contact',
   ])
     await expect(page.locator('#' + id)).toHaveCount(1);
+  await expect(page.locator('#flowers')).toHaveCount(0);
   const missing = await page
     .locator('a[href^="#"]')
     .evaluateAll((links) =>
@@ -91,8 +91,8 @@ test('mobile More and desktop menu retain keyboard close and focus return', asyn
     expect(await dock.locator('.dock-item').allTextContents()).toEqual([
       'Home',
       'About',
-      'Flowers',
       'Pooja Flowers',
+      'Decorations',
       'More',
     ]);
     const more = dock.getByRole('button', { name: 'More' });

@@ -25,17 +25,14 @@ import {
   Menu,
   X,
   MoveRight,
-  Plus,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 import { EntranceReadyContext } from './entrance-context';
-import { photos, type PublicContent, type CatalogItem } from '@/lib/public-content';
-import { inr } from '@/lib/business';
+import { photos, type PublicContent } from '@/lib/public-content';
 const nav = [
   ['Home', 'home'],
   ['About', 'about'],
-  ['Flowers', 'flowers'],
   ['Pooja Flowers', 'pooja'],
   ['Decorations', 'decorations'],
   ['Our Work', 'work'],
@@ -151,8 +148,6 @@ export function Website({ content: c }: { content: PublicContent }) {
   }, [entranceReady]);
   const root = useRef<HTMLDivElement>(null),
     [menu, setMenu] = useState(false),
-    [filter, setFilter] = useState('All flowers'),
-    [item, setItem] = useState<CatalogItem | null>(null),
     [inquiry, setInquiry] = useState(''),
     [service, setService] = useState('Weddings'),
     [occasionAlbum, setOccasionAlbum] = useState<string | null>(null),
@@ -191,10 +186,8 @@ export function Website({ content: c }: { content: PublicContent }) {
     };
   }, [entranceReady]);
   const open = (type: string) => {
-    setItem(null);
     setInquiry(type);
   };
-  const categories = ['All flowers', ...new Set(c.catalog.map((x) => x.category))];
   const selectedService = findOccasionService(c.services, service);
   return (
     <div className="website" ref={root}>
@@ -271,7 +264,7 @@ export function Website({ content: c }: { content: PublicContent }) {
           ...nav.slice(0, 4).map(([label, id], index) => ({
             id,
             label,
-            icon: [House, BookOpen, Flower2, Sprout][index],
+            icon: [House, BookOpen, Sprout, Flower2][index],
             href: '#' + id,
             active: activeSection === id,
           })),
@@ -305,8 +298,8 @@ export function Website({ content: c }: { content: PublicContent }) {
                 'Thoughtfully gathered. Beautifully given. Flowers for everyday rituals and life’s extraordinary moments.'}
             </p>
             <div className="hero-actions reveal">
-              <a className="button botanical-button" href="#flowers">
-                Explore our flowers <ArrowUpRight size={18} />
+              <a className="button botanical-button" href="#decorations">
+                Explore our occasions <ArrowUpRight size={18} />
                 <Botanical />
               </a>
               <a className="text-link" href="#decorations">
@@ -409,75 +402,9 @@ export function Website({ content: c }: { content: PublicContent }) {
             <div className="signature">With flowers, with feeling.</div>
           </div>
         </section>
-        <section id="flowers" className="collections section-pad">
-          <div className="section-top">
-            <div>
-              <div className="eyebrow">02 — THE FLOWER COLLECTION</div>
-              <h2>
-                {c.sections.collections?.headline || (
-                  <>
-                    A gesture. A feeling.
-                    <br />
-                    <em>A beautiful bunch.</em>
-                  </>
-                )}
-              </h2>
-            </div>
-            <p>
-              For the grand declarations.
-              <br />
-              And the just-because moments.
-            </p>
-          </div>
-          <div className="filter-row" aria-label="Filter collections">
-            {categories.map((n) => (
-              <button
-                key={n}
-                className={filter === n ? 'active' : ''}
-                aria-pressed={filter === n}
-                onClick={() => setFilter(n)}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
-          <div className="flower-grid">
-            {c.catalog
-              .filter((x) => filter === 'All flowers' || x.category === filter)
-              .map((x, i) => (
-                <button className="flower-card" key={x.id} onClick={() => setItem(x)}>
-                  <div className="flower-photo">
-                    <Image
-                      fill
-                      src={x.image_url || photos.roses}
-                      alt={x.name}
-                      sizes="(max-width:700px) 90vw, 30vw"
-                    />
-                    <span className="collection-number">0{i + 1}</span>
-                    <span className="circle-arrow">
-                      <ArrowUpRight size={22} />
-                    </span>
-                  </div>
-                  <div className="flower-card-bottom">
-                    <div>
-                      <small>{x.category}</small>
-                      <h3>{x.name}</h3>
-                    </div>
-                    {x.price != null && <span>{inr(x.price)}</span>}
-                  </div>
-                </button>
-              ))}
-          </div>
-          {!c.catalog.length && (
-            <p>Our next collection is being gathered. Enquire for a custom arrangement.</p>
-          )}
-          <button className="text-link collection-custom" onClick={() => open('Custom Bouquet')}>
-            Something uniquely yours? Build a bouquet inquiry <Plus size={18} />
-          </button>
-        </section>
         <section id="pooja" className="pooja">
           <div className="pooja-copy">
-            <div className="eyebrow">03 — EVERYDAY, SACRED</div>
+            <div className="eyebrow">02 — EVERYDAY, SACRED</div>
             <h2>
               {pooja.headline || (
                 <>
@@ -516,7 +443,7 @@ export function Website({ content: c }: { content: PublicContent }) {
         <section id="decorations" className="decorations section-pad">
           <div className="section-top">
             <div>
-              <div className="eyebrow">04 — OCCASIONS, TRANSFORMED</div>
+              <div className="eyebrow">03 — OCCASIONS, TRANSFORMED</div>
               <h2>
                 {c.sections.decorations?.headline || (
                   <>
@@ -587,7 +514,7 @@ export function Website({ content: c }: { content: PublicContent }) {
         <section id="work" className="work section-pad">
           <div className="section-top">
             <div>
-              <div className="eyebrow">05 — OUR WORK</div>
+              <div className="eyebrow">04 — OUR WORK</div>
               <h2>
                 {c.sections.work?.headline || (
                   <>
@@ -755,7 +682,7 @@ export function Website({ content: c }: { content: PublicContent }) {
           <nav className="footer-nav" aria-label="Footer navigation">
             {[
               { title: 'Explore', ids: ['home', 'about', 'work', 'testimonials'] },
-              { title: 'Flowers & occasions', ids: ['flowers', 'pooja', 'decorations', 'contact'] },
+              { title: 'Flowers & occasions', ids: ['pooja', 'decorations', 'contact'] },
             ].map((group) => (
               <div className="footer-link-group" key={group.title}>
                 <p className="footer-link-title">{group.title}</p>
@@ -789,20 +716,6 @@ export function Website({ content: c }: { content: PublicContent }) {
             occasion={occasionAlbum}
             photos={occasionPhotos(c.services, occasionAlbum)}
           />
-        </Modal>
-      )}
-      {item && (
-        <Modal title={item.name} className="collection-dialog" onClose={() => setItem(null)}>
-          <Image src={item.image_url || photos.roses} width={600} height={650} alt={item.name} />
-          <div>
-            <span className="eyebrow">{item.category}</span>
-            <h2>{item.name}</h2>
-            <p>{item.description}</p>
-            {item.price != null && <p>From {inr(item.price)}</p>}
-            <button className="button" onClick={() => open('Bouquet: ' + item.name)}>
-              Enquire about this arrangement <ArrowUpRight size={18} />
-            </button>
-          </div>
         </Modal>
       )}
       {inquiry && (
