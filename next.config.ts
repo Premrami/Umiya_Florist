@@ -1,7 +1,8 @@
 import type { NextConfig } from 'next';
-import { publicSiteOrigin } from './src/lib/seo';
+import { isPreviewDeployment, publicSiteOrigin } from './src/lib/public-origin.mjs';
 const config: NextConfig = {
   poweredByHeader: false,
+  experimental: { agentUpgrade: 'security' },
   outputFileTracingIncludes: {
     '/api/admin/pdf': ['./public/fonts/**'],
     '/api/invoice/*': ['./public/fonts/**'],
@@ -33,6 +34,7 @@ const config: NextConfig = {
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
+          ...(isPreviewDeployment() ? [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] : []),
           {
             key: 'Content-Security-Policy',
             value: [

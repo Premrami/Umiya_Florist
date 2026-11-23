@@ -467,6 +467,7 @@
   color: var(--lux-text);
 }
 .admin-shell .calendar-grid > div {
+  color: var(--lux-text);
   background: var(--lux-pearl);
   border-color: var(--lux-border);
 }
@@ -931,4 +932,12 @@
   border: 1px solid var(--lux-border);
   border-radius: 8px;
   margin-bottom: 20px;
+}
+
+/* Supporting copy must remain legible on both pearl and nude panels. */
+.admin-shell .inquiry-alert-panel > p,
+.admin-shell .configuration-panel > p,
+.admin-shell .launch-readiness > p,
+.admin-shell .launch-readiness li p {
+  color: var(--lux-text);
 }

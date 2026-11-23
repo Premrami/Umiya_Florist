@@ -1,4 +1,4 @@
-import { publicSiteOrigin } from './seo';
+import { isPreviewDeployment, publicSiteOrigin } from './public-origin.mjs';
 import { postalAddress, privacyNoticeReady } from './business-details';
 export type ReadinessCheck = { id: string; label: string; ready: boolean; nextAction: string };
 export function launchChecks(
@@ -35,7 +35,7 @@ export function launchChecks(
     {
       id: 'preview',
       label: 'Production indexing environment',
-      ready: environment.VERCEL_ENV !== 'preview',
+      ready: !isPreviewDeployment(environment),
       nextAction:
         'Deploy as production after verifying public metadata; preview builds stay unindexed.',
     },

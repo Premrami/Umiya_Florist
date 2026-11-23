@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { postalAddress } from './business-details';
 
-import { publicSiteOrigin } from './public-origin.mjs';
+import { isPreviewDeployment, publicSiteOrigin } from './public-origin.mjs';
 export { publicSiteOrigin } from './public-origin.mjs';
 export function publicPageMetadata(title: string, description: string, path = '/'): Metadata {
   const origin = publicSiteOrigin();
@@ -17,7 +17,7 @@ export function publicPageMetadata(title: string, description: string, path = '/
   return {
     title,
     description,
-    robots: { index: !!origin && process.env.VERCEL_ENV !== 'preview', follow: true },
+    robots: { index: !!origin && !isPreviewDeployment(), follow: true },
     ...(url ? { alternates: { canonical: url } } : {}),
     openGraph: {
       title,

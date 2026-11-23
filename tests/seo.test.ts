@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import nextConfig from '../next.config';
+import { launchChecks } from '../src/lib/readiness';
 import {
   businessStructuredData,
   publicPageMetadata,
@@ -34,6 +36,37 @@ describe('production SEO', () => {
     vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://flowers.example.com');
     vi.stubEnv('VERCEL_ENV', 'preview');
     expect(publicPageMetadata('Home', 'Details').robots).toMatchObject({ index: false });
+  });
+  it.each(['deploy-preview', 'branch-deploy', 'dev'])(
+    'keeps Netlify %s metadata, headers and launch readiness unindexed',
+    async (context) => {
+      vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://flowers.example.com');
+      vi.stubEnv('CONTEXT', context);
+      expect(publicPageMetadata('Home', 'Details').robots).toMatchObject({ index: false });
+      const headers = await nextConfig.headers!();
+      expect(headers.find((rule) => rule.source === '/:path*')?.headers).toContainEqual({
+        key: 'X-Robots-Tag',
+        value: 'noindex, nofollow',
+      });
+      expect(
+        launchChecks({}, { CONTEXT: context }).find((check) => check.id === 'preview')?.ready,
+      ).toBe(false);
+    },
+  );
+  it('allows indexing for the configured Netlify production site', async () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://flowers.example.com');
+    vi.stubEnv('CONTEXT', 'production');
+    vi.stubEnv('VERCEL_ENV', 'production');
+    expect(publicPageMetadata('Home', 'Details').robots).toMatchObject({ index: true });
+    const headers = await nextConfig.headers!();
+    expect(
+      headers
+        .find((rule) => rule.source === '/:path*')
+        ?.headers.some((header) => header.key === 'X-Robots-Tag'),
+    ).toBe(false);
+    expect(
+      launchChecks({}, { CONTEXT: 'production' }).find((check) => check.id === 'preview')?.ready,
+    ).toBe(true);
   });
   it('does not fabricate business contact or rich-result facts', () => {
     vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://flowers.example.com');

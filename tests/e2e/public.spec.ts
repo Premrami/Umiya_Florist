@@ -230,3 +230,68 @@ test('occasion gallery opens beside inquiry action, browses its photos and resto
     page.getByRole('dialog', { name: 'Balloon Decorations gallery', exact: true }),
   ).toBeVisible();
 });
+
+for (const kind of ['daily', 'event'] as const) {
+  test(`${kind} inquiry preserves required details, validation and confirmation`, async ({
+    page,
+  }) => {
+    const submissions: Record<string, unknown>[] = [];
+    await page.route('**/api/public/inquiries', async (route) => {
+      submissions.push(route.request().postDataJSON());
+      await route.fulfill({ status: 201, json: { received: true } });
+    });
+    await page.goto('/?intro=0');
+    await page
+      .getByRole('button', {
+        name: kind === 'daily' ? 'Enquire about daily flowers' : 'Plan your event',
+        exact: true,
+      })
+      .click();
+    const dialog = page.locator('.inquiry-dialog[open]');
+    const send = dialog.getByRole('button', { name: 'Send your inquiry', exact: true });
+    await send.click();
+    expect(submissions).toHaveLength(0);
+    await dialog.getByLabel('Your name', { exact: true }).fill('Audit fixture');
+    await dialog.getByLabel('Phone number', { exact: true }).fill('+91abc9876543210');
+    await expect(dialog.getByLabel('Phone number', { exact: true })).toHaveValue('+919876543210');
+    await dialog.getByLabel('Tell us a little more').fill('Simulated audit inquiry only.');
+    if (kind === 'daily') {
+      await dialog.getByLabel('Delivery address / area').fill('Audit test area');
+      await dialog.getByLabel('Flower requirements').fill('Seasonal flowers');
+      await dialog.getByLabel('Delivery frequency', { exact: true }).selectOption('Daily');
+    } else {
+      await dialog.getByLabel('Event type').fill('Wedding');
+      await dialog.getByLabel('Venue / location').fill('Audit venue');
+      await dialog.getByLabel('Event date').fill('2099-12-31');
+      await dialog.getByLabel('Preferred contact', { exact: true }).selectOption('Phone');
+      const guests = dialog.getByLabel('Expected guests');
+      await guests.fill('25');
+      await guests.pressSequentially('eabc');
+      await expect(guests).toHaveValue('25');
+      await dialog.getByLabel('Approximate budget (₹)').fill('2500.50');
+    }
+    await send.click();
+    await expect(page.getByRole('dialog', { name: 'Inquiry sent', exact: true })).toBeVisible();
+    expect(submissions).toHaveLength(1);
+    expect(submissions[0]).toMatchObject({
+      name: 'Audit fixture',
+      phone: '+919876543210',
+      marketing_consent: false,
+      ...(kind === 'daily'
+        ? {
+            type: 'Pooja Flower Subscription',
+            address: 'Audit test area',
+            flowers: 'Seasonal flowers',
+            frequency: 'Daily',
+          }
+        : {
+            type: 'Event Decoration',
+            event_type: 'Wedding',
+            venue: 'Audit venue',
+            date: '2099-12-31',
+            guests: '25',
+            budget: '2500.50',
+          }),
+    });
+  });
+}

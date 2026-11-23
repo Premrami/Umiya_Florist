@@ -19,3 +19,13 @@ export function publicSiteOrigin(raw = process.env.NEXT_PUBLIC_APP_URL) {
     return undefined;
   }
 }
+
+/** Keep hosted previews out of search results on both supported deployment platforms.
+ * @param {Record<string, string | undefined>} [environment]
+ */
+export function isPreviewDeployment(environment = process.env) {
+  return (
+    environment.VERCEL_ENV === 'preview' ||
+    ['deploy-preview', 'branch-deploy', 'dev'].includes(environment.CONTEXT ?? '')
+  );
+}

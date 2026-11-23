@@ -1,5 +1,5 @@
 import nextEnv from '@next/env';
-import { publicSiteOrigin } from '../src/lib/public-origin.mjs';
+import { isPreviewDeployment, publicSiteOrigin } from '../src/lib/public-origin.mjs';
 nextEnv.loadEnvConfig(process.cwd());
 const env = process.env;
 const checks = [
@@ -20,7 +20,7 @@ const checks = [
   })),
   {
     id: 'production-environment',
-    ready: env.VERCEL_ENV !== 'preview',
+    ready: !isPreviewDeployment(env),
     action: 'Use the production environment for the launch build; previews remain noindex.',
   },
 ];
