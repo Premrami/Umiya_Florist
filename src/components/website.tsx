@@ -695,6 +695,14 @@ export function Website({ content: c }: { content: PublicContent }) {
                   ))}
               </div>
             ))}
+            <div className="footer-link-group footer-contact">
+              <p className="footer-link-title">Contact us</p>
+              <a href="tel:+919327048875">Pankaj Rami · +91 93270 48875</a>
+              <a href="tel:+919624134939">Prem Rami · +91 96241 34939</a>
+              <a className="footer-email" href="mailto:umiyaflorist@gmail.com">
+                Email: umiyaflorist@gmail.com
+              </a>
+            </div>
           </nav>
         </div>
         <div className="footer-bottom">
