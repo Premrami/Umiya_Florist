@@ -1424,7 +1424,7 @@ body {
   padding: 0;
   text-align: left;
   overflow: hidden;
-  border: 1px solid var(--lux-border);
+  border: 2px solid var(--lux-rose);
   border-radius: 8px;
   background: var(--lux-nude);
   color: var(--lux-text);
@@ -1434,10 +1434,6 @@ body {
   width: 100%;
   height: 260px;
   object-fit: cover;
-}
-.occasion-gallery-grid span {
-  padding: 12px;
-  font-size: 11px;
 }
 .occasion-gallery-content :is(.occasion-back, .occasion-gallery-controls button) {
   display: inline-flex;
@@ -1634,4 +1630,15 @@ body {
     padding-top: 20px;
     border-top: 1px solid #b88a7840;
   }
+}
+
+.occasion-gallery-content > .occasion-photo-description {
+  margin: 16px 0 0;
+  padding: 16px 18px;
+  border-left: 2px solid var(--lux-rose);
+  color: var(--lux-text);
+  background: var(--lux-nude);
+  font: 400 13px/1.8 var(--font-body);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
 }

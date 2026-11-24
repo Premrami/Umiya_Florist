@@ -189,6 +189,17 @@ export function Website({ content: c }: { content: PublicContent }) {
     setInquiry(type);
   };
   const selectedService = findOccasionService(c.services, service);
+  const albumPhotos = occasionAlbum ? occasionPhotos(c.services, occasionAlbum) : [];
+  const albumDescriptions = albumPhotos.map((url) =>
+    findOccasionService(
+      c.services.filter(
+        (entry) =>
+          entry.image_url === url &&
+          (entry.status === undefined || entry.status === 'published'),
+      ),
+      occasionAlbum || '',
+    )?.description?.trim() || '',
+  );
   return (
     <div className="website" ref={root}>
       {c.preview && (
@@ -722,7 +733,8 @@ export function Website({ content: c }: { content: PublicContent }) {
         >
           <OccasionGallery
             occasion={occasionAlbum}
-            photos={occasionPhotos(c.services, occasionAlbum)}
+            photos={albumPhotos}
+            descriptions={albumDescriptions}
           />
         </Modal>
       )}

@@ -2,7 +2,15 @@
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
-export function OccasionGallery({ occasion, photos }: { occasion: string; photos: string[] }) {
+export function OccasionGallery({
+  occasion,
+  photos,
+  descriptions = [],
+}: {
+  occasion: string;
+  photos: string[];
+  descriptions?: string[];
+}) {
   const [selected, setSelected] = useState<number | null>(null);
   const backButton = useRef<HTMLButtonElement>(null);
   const grid = useRef<HTMLDivElement>(null);
@@ -57,7 +65,6 @@ export function OccasionGallery({ occasion, photos }: { occasion: string; photos
                   alt={occasion + ' floral decoration ' + (index + 1)}
                   sizes="(max-width:600px) 45vw, 30vw"
                 />
-                <span>View photo {index + 1}</span>
               </button>
             ))}
           </div>
@@ -78,6 +85,11 @@ export function OccasionGallery({ occasion, photos }: { occasion: string; photos
               sizes="(max-width:600px) 90vw, 1000px"
             />
           </div>
+          {descriptions[selected] && (
+            <p className="occasion-photo-description" aria-live="polite">
+              {descriptions[selected]}
+            </p>
+          )}
           <div className="occasion-gallery-controls">
             <button
               type="button"

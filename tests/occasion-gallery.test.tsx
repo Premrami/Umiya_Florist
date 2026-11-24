@@ -30,12 +30,19 @@ it('groups matching published photos, removes repeats and excludes other occasio
 });
 it('opens photos, wraps navigation and returns to the thumbnail gallery', () => {
   render(
-    <OccasionGallery occasion="Weddings" photos={['/images/hero.jpg', '/images/wedding.jpg']} />,
+    <OccasionGallery
+      occasion="Weddings"
+      photos={['/images/hero.jpg', '/images/wedding.jpg']}
+      descriptions={['A romantic rose backdrop.', 'A floral wedding entrance.']}
+    />,
   );
   fireEvent.click(screen.getByRole('button', { name: 'Open weddings photo 1' }));
   expect(screen.getByRole('status').textContent).toContain('1 of 2');
+  expect(screen.getByText('A romantic rose backdrop.')).toBeTruthy();
   fireEvent.click(screen.getByRole('button', { name: 'Previous occasion photo' }));
   expect(screen.getByRole('status').textContent).toContain('2 of 2');
+  expect(screen.getByText('A floral wedding entrance.')).toBeTruthy();
+  expect(screen.queryByText('A romantic rose backdrop.')).toBeNull();
   fireEvent.keyDown(screen.getByRole('button', { name: 'Next occasion photo' }), {
     key: 'ArrowRight',
   });
