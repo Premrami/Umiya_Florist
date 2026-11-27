@@ -5,7 +5,9 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 vi.mock('next/image', () => ({
   default: ({ src, alt }: { src: string; alt: string }) => createElement('img', { src, alt }),
 }));
-vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn(), replace: vi.fn() }) }));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: vi.fn(), replace: vi.fn(), prefetch: vi.fn() }),
+}));
 import { Admin } from '../src/components/admin';
 const id = '44444444-4444-4444-8444-444444444444';
 const photo = {

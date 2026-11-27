@@ -1,5 +1,6 @@
 'use client';
 import { FormInput } from './form-input';
+import { useStudioDataCache, type StudioCache } from './studio-data-cache';
 import Image from 'next/image';
 import { approvedImageUrl } from '@/lib/studio-media';
 import { StudioImageField } from './studio-image-field';
@@ -82,8 +83,9 @@ const names = [
   'Settings',
 ];
 const human = (s: string) => s.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-async function api(path: string, body?: unknown) {
+async function api(path: string, body?: unknown, signal?: AbortSignal) {
   const res = await fetch(path, {
+    signal,
     ...(body
       ? {
           method: 'POST',
@@ -94,7 +96,10 @@ async function api(path: string, body?: unknown) {
   });
   const json = await res.json();
   if (!res.ok)
-    throw Object.assign(new Error(json.error ?? 'Request failed'), { field: json.field });
+    throw Object.assign(new Error(json.error ?? 'Request failed'), {
+      field: json.field,
+      status: res.status,
+    });
   return json;
 }
 const moneyFields = [
@@ -122,20 +127,26 @@ function value(key: string, v: any) {
 }
 export function Admin({ module, profile }: { module: string; profile: Row }) {
   const router = useRouter();
+  const workspaceCache = useStudioDataCache();
+  const [localCache] = useState<StudioCache>(() => new Map());
+  const cache = workspaceCache ?? localCache;
+  const initialCacheKey = JSON.stringify([profile.id, profile.role, module, 0, '', false]);
+  const initialSnapshot = cache.get(initialCacheKey);
+  const loadRequest = useRef<AbortController | null>(null);
   const [restoringPhotoId, setRestoringPhotoId] = useState<string | null>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [rows, setRows] = useState<Row[]>([]),
-    [count, setCount] = useState(0),
+  const [rows, setRows] = useState<Row[]>(initialSnapshot?.rows ?? []),
+    [count, setCount] = useState(initialSnapshot?.count ?? 0),
     [page, setPage] = useState(0),
     [search, setSearch] = useState(''),
     [showDeletedPhotos, setShowDeletedPhotos] = useState(false),
-    [busy, setBusy] = useState(true),
+    [busy, setBusy] = useState(!initialSnapshot),
     [error, setError] = useState(''),
     [notice, setNotice] = useState(''),
     [mobile, setMobile] = useState(false),
     [edit, setEdit] = useState<Row | null>(null),
     [action, setAction] = useState<{ name: string; row?: Row } | null>(null),
-    [overview, setOverview] = useState<Row>({}),
+    [overview, setOverview] = useState<Row>(initialSnapshot?.overview ?? {}),
     [customers, setCustomers] = useState<Row[]>([]),
     [detail, setDetail] = useState<Row | null>(null),
     [ledger, setLedger] = useState<Row[]>([]),
@@ -198,29 +209,66 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
         : module === 'reports'
           ? 'Business reports'
           : spec?.title;
+  const cacheKey = JSON.stringify([
+    profile.id,
+    profile.role,
+    module,
+    page,
+    search,
+    showDeletedPhotos,
+  ]);
   const load = useCallback(async () => {
-    setBusy(true);
+    loadRequest.current?.abort();
+    const controller = new AbortController();
+    loadRequest.current = controller;
+    const cached = cache.get(cacheKey);
+    setBusy(!cached);
+    setRows(cached?.rows ?? []);
+    setCount(cached?.count ?? 0);
+    setOverview(cached?.overview ?? {});
     setError('');
     try {
-      if (['dashboard', 'reports'].includes(module)) {
-        setOverview((await api('/api/admin/overview')).data);
-      } else {
-        const r = await api(
-          `/api/admin/${module}?page=${page}&search=${encodeURIComponent(search)}${module === 'services' && showDeletedPhotos ? '&show_deleted=1' : ''}`,
-        );
-        setRows(r.data ?? []);
-        setCount(r.count ?? 0);
-      }
+      const summary = ['dashboard', 'reports'].includes(module);
+      const result = await api(
+        summary
+          ? '/api/admin/overview'
+          : `/api/admin/${module}?page=${page}&search=${encodeURIComponent(search)}${module === 'services' && showDeletedPhotos ? '&show_deleted=1' : ''}`,
+        undefined,
+        controller.signal,
+      );
+      if (controller.signal.aborted) return;
+      const snapshot = {
+        rows: summary ? [] : (result.data ?? []),
+        count: summary ? 0 : (result.count ?? 0),
+        overview: summary ? (result.data ?? {}) : {},
+      };
+      cache.set(cacheKey, snapshot);
+      // Bound memory while retaining recently visited tabs and queries.
+      if (cache.size > 50) cache.delete(cache.keys().next().value!);
+      setRows(snapshot.rows);
+      setCount(snapshot.count);
+      setOverview(snapshot.overview);
     } catch (e) {
+      if (controller.signal.aborted) return;
+      if (e instanceof Error && 'status' in e && [401, 403].includes(Number(e.status))) {
+        cache.clear();
+        setRows([]);
+        setCount(0);
+        setOverview({});
+      }
       setError(e instanceof Error ? e.message : 'Could not load records');
     } finally {
-      setBusy(false);
+      if (!controller.signal.aborted) setBusy(false);
     }
-  }, [module, page, search, showDeletedPhotos]);
+  }, [cache, cacheKey, module, page, search, showDeletedPhotos]);
   useEffect(() => {
-    const timer = setTimeout(load, 200);
-    return () => clearTimeout(timer);
-  }, [load]);
+    // Debounce typed searches only; opening a tab should start immediately.
+    const timer = setTimeout(() => void load(), search ? 200 : 0);
+    return () => {
+      clearTimeout(timer);
+      loadRequest.current?.abort();
+    };
+  }, [load, search]);
   useEffect(() => {
     if (can(profile.role, 'crm') || can(profile.role, 'finance'))
       api('/api/admin/lookups')
@@ -499,6 +547,8 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
               <Link
                 key={m}
                 href={'/admin/' + m}
+                onMouseEnter={() => router.prefetch('/admin/' + m)}
+                onFocus={() => router.prefetch('/admin/' + m)}
                 className={m === module ? 'active' : ''}
                 aria-current={m === module ? 'page' : undefined}
                 onClick={() => setMobile(false)}
@@ -516,6 +566,7 @@ export function Admin({ module, profile }: { module: string; profile: Row }) {
           <button
             onClick={async () => {
               await api('/api/auth', { action: 'logout' });
+              cache.clear();
               router.replace('/login');
               router.refresh();
             }}

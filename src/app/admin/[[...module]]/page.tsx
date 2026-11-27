@@ -26,5 +26,5 @@ export default async function Page({ params }: { params: Promise<{ module?: stri
         <Link href="/admin/dashboard">Return to dashboard</Link>
       </main>
     );
-  return <Admin module={activeModule} profile={auth.profile} />;
+  return <Admin key={activeModule} module={activeModule} profile={auth.profile} />;
 }

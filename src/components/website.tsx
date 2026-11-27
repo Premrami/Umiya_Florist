@@ -25,8 +25,6 @@ import {
   Menu,
   X,
   MoveRight,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 import { EntranceReadyContext } from './entrance-context';
 import { photos, type PublicContent } from '@/lib/public-content';
@@ -35,7 +33,6 @@ const nav = [
   ['About', 'about'],
   ['Pooja Flowers', 'pooja'],
   ['Decorations', 'decorations'],
-  ['Our Work', 'work'],
   ['Testimonials', 'testimonials'],
   ['Contact', 'contact'],
 ];
@@ -150,8 +147,7 @@ export function Website({ content: c }: { content: PublicContent }) {
     [menu, setMenu] = useState(false),
     [inquiry, setInquiry] = useState(''),
     [service, setService] = useState('Weddings'),
-    [occasionAlbum, setOccasionAlbum] = useState<string | null>(null),
-    [gallery, setGallery] = useState<number | null>(null);
+    [occasionAlbum, setOccasionAlbum] = useState<string | null>(null);
   const hero = c.sections.hero ?? {},
     about = c.sections.about ?? {},
     pooja = c.sections.pooja ?? {},
@@ -522,55 +518,6 @@ export function Website({ content: c }: { content: PublicContent }) {
             </div>
           </div>
         </section>
-        <section id="work" className="work section-pad">
-          <div className="section-top">
-            <div>
-              <div className="eyebrow">04 — OUR WORK</div>
-              <h2>
-                {c.sections.work?.headline || (
-                  <>
-                    Beautiful moments,
-                    <br />
-                    <em>beautifully remembered.</em>
-                  </>
-                )}
-              </h2>
-            </div>
-            <span className="quiet">
-              {c.portfolio.length
-                ? 'A selection from our studio.'
-                : 'Our approved project gallery is coming soon.'}
-            </span>
-          </div>
-          {c.portfolio.length ? (
-            <div className="portfolio-grid">
-              {c.portfolio.map((w, i) => (
-                <button key={w.id} onClick={() => setGallery(i)}>
-                  <Image
-                    width={900}
-                    height={700}
-                    src={w.image_url}
-                    alt=""
-                    sizes="(max-width: 700px) 100vw, 50vw"
-                  />
-                  <h3>{w.name}</h3>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="work-note">
-              <Flower2 size={52} strokeWidth={1} />
-              <p>
-                Every celebration has its own story.
-                <br />
-                Tell us about the one you’re planning.
-              </p>
-              <button className="text-link" onClick={() => open('Event Decoration')}>
-                Start a conversation <ArrowUpRight size={18} />
-              </button>
-            </div>
-          )}
-        </section>
         <section className="why section-pad">
           <div className="eyebrow">THE UMIYA TOUCH</div>
           <h2>
@@ -692,7 +639,7 @@ export function Website({ content: c }: { content: PublicContent }) {
           </div>
           <nav className="footer-nav" aria-label="Footer navigation">
             {[
-              { title: 'Explore', ids: ['home', 'about', 'work', 'testimonials'] },
+              { title: 'Explore', ids: ['home', 'about', 'testimonials'] },
               { title: 'Flowers & occasions', ids: ['pooja', 'decorations', 'contact'] },
             ].map((group) => (
               <div className="footer-link-group" key={group.title}>
@@ -745,41 +692,6 @@ export function Website({ content: c }: { content: PublicContent }) {
             {inquiry === 'Custom Bouquet' ? 'Your bouquet, your way.' : 'A beautiful beginning.'}
           </h2>
           <InquiryForm type={inquiry} />
-        </Modal>
-      )}
-      {gallery !== null && c.portfolio[gallery] && (
-        <Modal
-          className="gallery-dialog"
-          title="Portfolio gallery"
-          onClose={() => setGallery(null)}
-        >
-          <div
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowRight') setGallery((gallery + 1) % c.portfolio.length);
-              if (e.key === 'ArrowLeft')
-                setGallery((gallery - 1 + c.portfolio.length) % c.portfolio.length);
-            }}
-          >
-            <Image
-              src={c.portfolio[gallery].image_url}
-              width={1200}
-              height={800}
-              alt={c.portfolio[gallery].name}
-            />
-            <h2>{c.portfolio[gallery].name}</h2>
-            <button
-              aria-label="Previous photo"
-              onClick={() => setGallery((gallery - 1 + c.portfolio.length) % c.portfolio.length)}
-            >
-              <ChevronLeft />
-            </button>
-            <button
-              aria-label="Next photo"
-              onClick={() => setGallery((gallery + 1) % c.portfolio.length)}
-            >
-              <ChevronRight />
-            </button>
-          </div>
         </Modal>
       )}
     </div>

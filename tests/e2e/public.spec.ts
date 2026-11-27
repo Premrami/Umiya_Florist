@@ -10,12 +10,12 @@ test('public sections, anchor targets and readable server content', async ({ pag
     'about',
     'pooja',
     'decorations',
-    'work',
     'testimonials',
     'contact',
   ])
     await expect(page.locator('#' + id)).toHaveCount(1);
   await expect(page.locator('#flowers')).toHaveCount(0);
+  await expect(page.locator('#work')).toHaveCount(0);
   const missing = await page
     .locator('a[href^="#"]')
     .evaluateAll((links) =>
